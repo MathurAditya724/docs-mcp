@@ -1,0 +1,24 @@
+{
+  "name": "docs-mcp",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "lint": "bunx ultracite check",
+    "lint:fix": "bunx ultracite fix"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.47",
+    "@hono/mcp": "^0.2.3",
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "ai": "^6.0.103",
+    "hono": "^4.12.2",
+    "zod": "3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.4",
+    "ultracite": "^7.2.4",
+    "wrangler": "^4.4.0"
+  }
+}
