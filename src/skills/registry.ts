@@ -1,6 +1,5 @@
 import type { SentrySkill } from "../types";
 import bun from "./js/bun";
-import hono from "./js/hono";
 import nextjs from "./js/nextjs";
 import node from "./js/node";
 import flask from "./python/flask";
@@ -8,7 +7,6 @@ import flask from "./python/flask";
 const skills: Record<string, SentrySkill> = {
   bun,
   flask,
-  hono,
   nextjs,
   node,
 };
