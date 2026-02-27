@@ -39,6 +39,41 @@ interface GeneratedSkill {
   varName: string;
 }
 
+// ─── Stats Tracking ─────────────────────────────────────────────────────────
+
+const stats = {
+  agentCalls: 0,
+  docsPagesFetched: 0,
+  inputTokens: 0,
+  outputTokens: 0,
+  retries: 0,
+  startTime: 0,
+  totalTokens: 0,
+};
+
+// Anthropic pricing for claude-sonnet-4-6 (per million tokens)
+const PRICING = {
+  input: 3.0,
+  output: 15.0,
+};
+
+function formatDuration(ms: number): string {
+  const seconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  if (minutes > 0) {
+    return `${minutes}m ${remainingSeconds}s`;
+  }
+  return `${seconds}s`;
+}
+
+function formatCost(tokens: { input: number; output: number }): string {
+  const cost =
+    (tokens.input / 1_000_000) * PRICING.input +
+    (tokens.output / 1_000_000) * PRICING.output;
+  return `$${cost.toFixed(4)}`;
+}
+
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 const ROOT = join(dirname(new URL(import.meta.url).pathname), "..");
@@ -218,6 +253,7 @@ async function fetchDocsPage(url: string): Promise<string | null> {
       console.warn(`  ⚠ Failed to fetch ${url}: ${response.status}`);
       return null;
     }
+    stats.docsPagesFetched++;
     const html = await response.text();
     // Strip HTML tags for a rough text extraction
     return html
@@ -247,6 +283,42 @@ function toVarName(slug: string): string {
   return slug.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 }
 
+function parseSkillResponse(text: string): SkillOutput {
+  let jsonStr = text.trim();
+  if (jsonStr.startsWith("```")) {
+    jsonStr = jsonStr.replace(FENCE_START, "").replace(FENCE_END, "");
+  }
+
+  const parsed = JSON.parse(jsonStr) as SkillOutput;
+
+  if (
+    !(parsed.name && parsed.slug && parsed.features && parsed.gettingStarted)
+  ) {
+    throw new Error("Missing required fields in agent output");
+  }
+
+  return parsed;
+}
+
+async function callAgent(userPrompt: string, attempt: number) {
+  stats.agentCalls++;
+  if (attempt > 0) {
+    stats.retries++;
+  }
+
+  const { text, usage } = await generateText({
+    model: anthropic("claude-sonnet-4-6"),
+    prompt: userPrompt,
+    system: SYSTEM_PROMPT,
+  });
+
+  stats.inputTokens += usage.inputTokens ?? 0;
+  stats.outputTokens += usage.outputTokens ?? 0;
+  stats.totalTokens += usage.totalTokens ?? 0;
+
+  return parseSkillResponse(text);
+}
+
 async function generateSkillJson(
   docsContent: string,
   metadata: {
@@ -271,33 +343,7 @@ ${docsContent}`;
 
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      const { text } = await generateText({
-        model: anthropic("claude-sonnet-4-6"),
-        prompt: userPrompt,
-        system: SYSTEM_PROMPT,
-      });
-
-      // Try to extract JSON from the response (strip markdown fences if present)
-      let jsonStr = text.trim();
-      if (jsonStr.startsWith("```")) {
-        jsonStr = jsonStr.replace(FENCE_START, "").replace(FENCE_END, "");
-      }
-
-      const parsed = JSON.parse(jsonStr) as SkillOutput;
-
-      // Validate required fields
-      if (
-        !(
-          parsed.name &&
-          parsed.slug &&
-          parsed.features &&
-          parsed.gettingStarted
-        )
-      ) {
-        throw new Error("Missing required fields in agent output");
-      }
-
-      return parsed;
+      return await callAgent(userPrompt, attempt);
     } catch (error) {
       if (attempt === 0) {
         console.warn(
@@ -439,6 +485,7 @@ export { skills };
 
 async function main() {
   console.log("🔧 Sentry Skills Generator\n");
+  stats.startTime = Date.now();
 
   // 1. Read sdks.json
   const sdksRaw = readFileSync(SDKS_PATH, "utf-8");
@@ -574,15 +621,40 @@ async function main() {
   console.log("  ✓ Generated src/skills/registry.ts");
 
   // 5. Summary
-  console.log(`\n${"═".repeat(50)}`);
-  console.log(`✅ Generated: ${generated.length} skills`);
+  const elapsed = Date.now() - stats.startTime;
+  const jsCount = generated.filter((s) => s.ecosystem === "javascript").length;
+  const pyCount = generated.filter((s) => s.ecosystem === "python").length;
+
+  console.log(`\n${"═".repeat(56)}`);
+  console.log("  Sentry Skills Generator — Run Summary");
+  console.log("═".repeat(56));
+  console.log(
+    `  Skills generated:  ${generated.length} (${jsCount} JS, ${pyCount} Python)`
+  );
+  console.log(`  Failures:          ${failures.length}`);
+  console.log(`  Docs pages fetched:${stats.docsPagesFetched}`);
+  console.log("─".repeat(56));
+  console.log(
+    `  Agent calls:       ${stats.agentCalls} (${stats.retries} retries)`
+  );
+  console.log(`  Input tokens:      ${stats.inputTokens.toLocaleString()}`);
+  console.log(`  Output tokens:     ${stats.outputTokens.toLocaleString()}`);
+  console.log(`  Total tokens:      ${stats.totalTokens.toLocaleString()}`);
+  console.log(
+    `  Estimated cost:    ${formatCost({ input: stats.inputTokens, output: stats.outputTokens })}`
+  );
+  console.log("─".repeat(56));
+  console.log(`  Duration:          ${formatDuration(elapsed)}`);
+
   if (failures.length > 0) {
-    console.log(`❌ Failed: ${failures.length}`);
+    console.log("─".repeat(56));
+    console.log("  Failures:");
     for (const f of failures) {
-      console.log(`   - ${f}`);
+      console.log(`    - ${f}`);
     }
   }
-  console.log("═".repeat(50));
+
+  console.log("═".repeat(56));
 }
 
 main().catch((error) => {
