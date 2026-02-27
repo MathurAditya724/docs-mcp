@@ -1,133 +1,45 @@
 import type { SentrySkill } from "../../types";
 
 const flask: SentrySkill = {
-  category: "framework",
-  ecosystem: "python",
-  features: [
+  "category": "framework",
+  "ecosystem": "python",
+  "features": [
     {
-      code: `import sentry_sdk
-
-sentry_sdk.init(
-    dsn="___PUBLIC_DSN___",
-    send_default_pii=True,
-)
-
-# Errors are captured automatically. To manually capture:
-sentry_sdk.capture_exception(Exception("Something went wrong"))
-sentry_sdk.capture_message("Something happened")`,
-      description:
-        "Automatically captures unhandled exceptions in your Flask application.",
-      name: "Error Monitoring",
-      setup:
-        "Error monitoring is enabled by default when you call sentry_sdk.init(). The Flask integration auto-activates when the flask package is installed. Unhandled exceptions in route handlers are captured automatically.",
-      slug: "error-monitoring",
+      "code": "import sentry_sdk\n\nsentry_sdk.init(\n    dsn=\"___PUBLIC_DSN___\",\n    send_default_pii=True,\n)\n\nfrom flask import Flask\n\napp = Flask(__name__)\n\n@app.route(\"/\")\ndef hello_world():\n    1 / 0  # raises an error\n    return \"<p>Hello, World!</p>\"",
+      "description": "Automatically capture errors and exceptions from Flask routes and report them to Sentry.",
+      "name": "Error Monitoring",
+      "setup": "Install the sentry-sdk package using pip. If you have the flask package in your dependencies, the Flask integration will be enabled automatically when you initialize the Sentry SDK. Call sentry_sdk.init() before creating your Flask app so that all errors are captured. Request data including HTTP method, URL, headers, and form data will be attached to all events automatically.",
+      "slug": "error-monitoring"
     },
     {
-      code: `import sentry_sdk
-
-sentry_sdk.init(
-    dsn="___PUBLIC_DSN___",
-    send_default_pii=True,
-    # Set traces_sample_rate to 1.0 to capture 100% of transactions for tracing.
-    # We recommend adjusting this value in production.
-    traces_sample_rate=1.0,
-)
-
-# Flask routes are automatically instrumented as transactions.
-# Each incoming HTTP request creates a trace.`,
-      description:
-        "Track performance across your Flask application with distributed tracing.",
-      name: "Tracing",
-      setup:
-        "Enable tracing by setting traces_sample_rate in your sentry_sdk.init() call. Flask routes are automatically instrumented as transactions.",
-      slug: "tracing",
+      "code": "import sentry_sdk\n\nsentry_sdk.init(\n    dsn=\"___PUBLIC_DSN___\",\n    send_default_pii=True,\n    traces_sample_rate=1.0,\n)\n\nfrom flask import Flask\n\napp = Flask(__name__)\n\n@app.route(\"/\")\ndef hello_world():\n    return \"<p>Hello, World!</p>\"",
+      "description": "Automatically create transactions for Flask requests and trace performance across your application.",
+      "name": "Tracing",
+      "setup": "Install the sentry-sdk package and initialize it with traces_sample_rate set to a value between 0.0 and 1.0. When you point your browser to a Flask route, a transaction will be created in the Performance section of sentry.io and connected to any error events that occur during the request.",
+      "slug": "tracing"
     },
     {
-      code: `import sentry_sdk
-
-sentry_sdk.init(
-    dsn="___PUBLIC_DSN___",
-    send_default_pii=True,
-    traces_sample_rate=1.0,
-    # Enable profiling
-    profile_session_sample_rate=1.0,
-    profile_lifecycle="trace",
-)`,
-      description:
-        "Identify slow or resource-intensive functions in your Flask application.",
-      name: "Profiling",
-      setup:
-        "Enable profiling by setting profile_session_sample_rate and profile_lifecycle in your sentry_sdk.init() call. Profiling requires tracing to be enabled. No additional packages needed — profiling is built into the Python SDK.",
-      slug: "profiling",
+      "code": "import sentry_sdk\n\nsentry_sdk.init(\n    dsn=\"___PUBLIC_DSN___\",\n    send_default_pii=True,\n    traces_sample_rate=1.0,\n    profile_session_sample_rate=1.0,\n    profile_lifecycle=\"trace\",\n)\n\nfrom flask import Flask\n\napp = Flask(__name__)\n\n@app.route(\"/\")\ndef hello_world():\n    return \"<p>Hello, World!</p>\"",
+      "description": "Collect code-level profiling data for Flask requests to identify performance bottlenecks.",
+      "name": "Profiling",
+      "setup": "Install the sentry-sdk package and initialize it with profile_session_sample_rate and profile_lifecycle options in addition to traces_sample_rate. Profiles will be automatically collected while there is an active span during Flask request handling.",
+      "slug": "profiling"
     },
     {
-      code: `import sentry_sdk
-
-sentry_sdk.init(
-    dsn="___PUBLIC_DSN___",
-    send_default_pii=True,
-    enable_logs=True,
-)
-
-# Use structured logging
-sentry_sdk.logger.info("User logged in", user_id="123")
-sentry_sdk.logger.warn("Slow query detected", duration=5000)
-sentry_sdk.logger.error("Operation failed", reason="timeout")`,
-      description:
-        "Centralize and analyze your application logs. Correlate them with errors and performance issues.",
-      name: "Logs",
-      setup:
-        "Enable logs by setting enable_logs=True in your sentry_sdk.init() call. Use sentry_sdk.logger.info(), .warn(), .error() to send structured logs. The Python SDK also automatically captures logs from the standard logging module as breadcrumbs.",
-      slug: "logs",
-    },
+      "code": "import sentry_sdk\nfrom sentry_sdk.integrations.logging import LoggingIntegration\nimport logging\n\nsentry_sdk.init(\n    dsn=\"___PUBLIC_DSN___\",\n    send_default_pii=True,\n    enable_logs=True,\n)\n\nfrom flask import Flask\n\napp = Flask(__name__)\n\n@app.route(\"/\")\ndef hello_world():\n    app.logger.info(\"Hello from Flask!\")\n    return \"<p>Hello, World!</p>\"",
+      "description": "Send structured logs emitted by Flask's logger or any Python logger to Sentry.",
+      "name": "Logs",
+      "setup": "Install the sentry-sdk package and initialize it with enable_logs=True. Logs emitted by app.logger or any logger will be recorded as breadcrumbs by the Logging integration, which is enabled by default. Setting enable_logs=True sends logs directly to Sentry as log events.",
+      "slug": "logs"
+    }
   ],
-  gettingStarted: `Install the Sentry Python SDK:
-
-\`\`\`bash
-pip install sentry-sdk
-\`\`\`
-
-The Flask integration activates automatically when the \`flask\` package is installed. No need to explicitly enable it.
-
-Initialize Sentry BEFORE creating your Flask app:
-
-\`\`\`python
-import sentry_sdk
-from flask import Flask
-
-sentry_sdk.init(
-    dsn="___PUBLIC_DSN___",
-    send_default_pii=True,
-    traces_sample_rate=1.0,
-)
-
-app = Flask(__name__)
-
-@app.route("/")
-def hello():
-    return "Hello, World!"
-\`\`\`
-
-To customize the Flask integration explicitly:
-
-\`\`\`python
-from sentry_sdk.integrations.flask import FlaskIntegration
-
-sentry_sdk.init(
-    dsn="___PUBLIC_DSN___",
-    send_default_pii=True,
-    integrations=[
-        FlaskIntegration(
-            transaction_style="url",
-            http_methods_to_capture=("GET", "POST"),
-        ),
-    ],
-)
-\`\`\``,
-  name: "Flask",
-  packages: ["sentry-sdk"],
-  rank: 10,
-  slug: "flask",
+  "gettingStarted": "## Flask SDK Setup\n\n### 1. Install the SDK\n\n```bash\npip install sentry-sdk\n```\n\n### 2. Initialize the SDK\n\nAdd the following to the top of your Flask application, before creating your Flask app:\n\n```python\nimport sentry_sdk\n\nsentry_sdk.init(\n    dsn=\"___PUBLIC_DSN___\",\n    # Add request headers and IP for users\n    send_default_pii=True,\n    # Set traces_sample_rate to 1.0 to capture 100%\n    # of transactions for tracing.\n    traces_sample_rate=1.0,\n    # To collect profiles for all profile sessions,\n    # set `profile_session_sample_rate` to 1.0.\n    profile_session_sample_rate=1.0,\n    # Profiles will be automatically collected while\n    # there is an active span.\n    profile_lifecycle=\"trace\",\n    # Enable logs to be sent to Sentry\n    enable_logs=True,\n)\n```\n\nIf you have the `flask` package in your dependencies, the Flask integration will be enabled automatically when you initialize the Sentry SDK.\n\n### 3. Create your Flask app\n\n```python\nfrom flask import Flask\n\napp = Flask(__name__)\n\n@app.route(\"/\")\ndef hello_world():\n    return \"<p>Hello, World!</p>\"\n```\n\n### 4. Verify the setup\n\nAdd an intentional error to test that everything is working:\n\n```python\nfrom flask import Flask\n\napp = Flask(__name__)\n\n@app.route(\"/debug-sentry\")\ndef trigger_error():\n    1 / 0  # raises a ZeroDivisionError\n    return \"<p>This won't be reached.</p>\"\n```\n\nVisit `http://localhost:5000/debug-sentry` in your browser. An error event will be sent to sentry.io and connected to a transaction in the Performance section.\n\n### 5. Optional: Configure FlaskIntegration explicitly\n\nYou can pass options to `FlaskIntegration` to customize its behavior:\n\n```python\nimport sentry_sdk\nfrom sentry_sdk.integrations.flask import FlaskIntegration\n\nsentry_sdk.init(\n    dsn=\"___PUBLIC_DSN___\",\n    send_default_pii=True,\n    traces_sample_rate=1.0,\n    integrations=[\n        FlaskIntegration(\n            transaction_style=\"url\",  # or \"endpoint\" (default)\n            http_methods_to_capture=(\"GET\", \"POST\", \"PUT\", \"DELETE\", \"PATCH\"),\n        ),\n    ],\n)\n```\n\n### Supported Versions\n\n- Flask: 1.1.4+\n- Python: 3.6+\n",
+  "name": "Flask",
+  "packages": [
+    "sentry-sdk"
+  ],
+  "rank": 7,
+  "slug": "flask"
 };
 
 export default flask;

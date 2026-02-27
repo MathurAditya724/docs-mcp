@@ -1,344 +1,52 @@
 import type { SentrySkill } from "../../types";
 
 const nextjs: SentrySkill = {
-  category: "framework",
-  ecosystem: "javascript",
-  features: [
+  "category": "framework",
+  "ecosystem": "javascript",
+  "features": [
     {
-      code: `// instrumentation-client.ts
-import * as Sentry from "@sentry/nextjs";
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-});
-
-// Errors are captured automatically. To manually capture:
-Sentry.captureException(new Error("Something went wrong"));
-Sentry.captureMessage("Something happened");
-
-// Add a global error boundary in app/global-error.tsx:
-// "use client";
-// import * as Sentry from "@sentry/nextjs";
-// import NextError from "next/error";
-// import { useEffect } from "react";
-//
-// export default function GlobalError({ error }) {
-//   useEffect(() => { Sentry.captureException(error); }, [error]);
-//   return (<html><body><NextError statusCode={0} /></body></html>);
-// }`,
-      description:
-        "Automatically captures unhandled exceptions, React rendering errors, and server-side errors across all Next.js runtimes.",
-      name: "Error Monitoring",
-      setup:
-        "Error monitoring is enabled by default when you call Sentry.init() in your instrumentation files. Create app/global-error.tsx to capture React rendering errors. The onRequestError handler in instrumentation.ts captures server-side errors.",
-      slug: "error-monitoring",
+      "code": "import * as Sentry from \"@sentry/nextjs\";\n\nSentry.init({\n  dsn: \"___PUBLIC_DSN___\",\n  sendDefaultPii: true,\n});",
+      "description": "Automatically capture errors and exceptions across all Next.js runtime environments (browser, Node.js, and edge).",
+      "name": "Error Monitoring",
+      "setup": "Run the Sentry wizard with `npx @sentry/wizard@latest -i nextjs` to automatically configure error monitoring. The wizard creates separate initialization files for each runtime: `instrumentation-client.ts` for the browser, `sentry.server.config.ts` for Node.js, and `sentry.edge.config.ts` for edge runtimes. It also creates `app/global-error.tsx` to capture React rendering errors and wraps your `next.config.ts` with `withSentryConfig`.",
+      "slug": "error-monitoring"
     },
     {
-      code: `// instrumentation-client.ts
-import * as Sentry from "@sentry/nextjs";
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-  // Set to 1.0 for development, lower in production
-  tracesSampleRate: process.env.NODE_ENV === "development" ? 1.0 : 0.1,
-});
-
-// sentry.server.config.ts
-import * as Sentry from "@sentry/nextjs";
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-  tracesSampleRate: process.env.NODE_ENV === "development" ? 1.0 : 0.1,
-});`,
-      description:
-        "Track page loads, navigations, and API route performance with distributed tracing across client and server.",
-      name: "Tracing",
-      setup:
-        "Enable tracing by setting tracesSampleRate in both instrumentation-client.ts and sentry.server.config.ts. Next.js page loads, navigations, and API routes are automatically instrumented.",
-      slug: "tracing",
+      "code": "import * as Sentry from \"@sentry/nextjs\";\n\nSentry.init({\n  dsn: \"___PUBLIC_DSN___\",\n  sendDefaultPii: true,\n  tracesSampleRate: process.env.NODE_ENV === \"development\" ? 1.0 : 0.1,\n});",
+      "description": "Monitor performance and trace requests across all Next.js runtime environments with distributed tracing.",
+      "name": "Tracing",
+      "setup": "Enable tracing by adding `tracesSampleRate` to your Sentry initialization in `instrumentation-client.ts`, `sentry.server.config.ts`, and `sentry.edge.config.ts`. The wizard automatically configures this when you select Tracing during setup. Use a sample rate of 1.0 for development and a lower value like 0.1 for production to manage event volume.",
+      "slug": "tracing"
     },
     {
-      code: `// instrumentation-client.ts
-import * as Sentry from "@sentry/nextjs";
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-  // Capture 10% of all sessions for replay
-  replaysSessionSampleRate: 0.1,
-  // Capture 100% of sessions with errors
-  replaysOnErrorSampleRate: 1.0,
-  integrations: [
-    Sentry.replayIntegration({
-      // Privacy options:
-      maskAllText: true,    // Replace text with asterisks
-      blockAllMedia: true,  // Block images/videos
-      maskAllInputs: true,  // Mask form inputs
-    }),
+      "code": "import * as Sentry from \"@sentry/nextjs\";\n\nSentry.init({\n  dsn: \"___PUBLIC_DSN___\",\n  sendDefaultPii: true,\n  replaysSessionSampleRate: 0.1,\n  replaysOnErrorSampleRate: 1.0,\n  integrations: [\n    Sentry.replayIntegration(),\n  ],\n});",
+      "description": "Record video-like session replays in the browser to watch exactly what users experienced when errors occurred.",
+      "name": "Session Replay",
+      "setup": "Enable Session Replay by adding the `replayIntegration()` to your client-side Sentry initialization in `instrumentation-client.ts`. Set `replaysSessionSampleRate` to control what percentage of all sessions are recorded, and `replaysOnErrorSampleRate` to control the rate of sessions recorded when an error occurs. The wizard automatically configures this when you select Session Replay during setup.",
+      "slug": "session-replay"
+    },
+    {
+      "code": "import * as Sentry from \"@sentry/nextjs\";\n\n// Initialize Sentry with logs enabled\nSentry.init({\n  dsn: \"___PUBLIC_DSN___\",\n  sendDefaultPii: true,\n  enableLogs: true,\n});\n\n// Send structured logs from anywhere in your app\nSentry.logger.info(\"User action\", { userId: \"123\" });\nSentry.logger.warn(\"Slow response\", { duration: 5000 });\nSentry.logger.error(\"Operation failed\", { reason: \"timeout\" });",
+      "description": "Send structured log entries from your Next.js application to Sentry for centralized log management.",
+      "name": "Logs",
+      "setup": "Enable structured logging by setting `enableLogs: true` in your Sentry initialization. The wizard automatically configures this when you select Logs during setup. Once enabled, use `Sentry.logger.info()`, `Sentry.logger.warn()`, and `Sentry.logger.error()` to send structured log entries with additional context from anywhere in your application.",
+      "slug": "logs"
+    },
+    {
+      "code": "import * as Sentry from \"@sentry/nextjs\";\n\nSentry.init({\n  dsn: \"___PUBLIC_DSN___\",\n  sendDefaultPii: true,\n  // Profiling is configured via tracesSampleRate\n  tracesSampleRate: 1.0,\n  profilesSampleRate: 1.0,\n});",
+      "description": "Profile your Next.js server-side code at the function level to identify performance bottlenecks.",
+      "name": "Profiling",
+      "setup": "Enable profiling by adding `profilesSampleRate` to your server-side Sentry initialization. Profiling requires tracing to be enabled, so ensure `tracesSampleRate` is also set. The profiling sample rate is relative to the tracing sample rate, so a value of 1.0 means 100% of sampled traces will include profiling data.",
+      "slug": "profiling"
+    }
   ],
-});
-
-// Recommended sampling rates by traffic level:
-// High traffic (100k+/day): replaysSessionSampleRate: 0.01, replaysOnErrorSampleRate: 1.0
-// Medium traffic (10k-100k/day): replaysSessionSampleRate: 0.1, replaysOnErrorSampleRate: 1.0
-// Low traffic (<10k/day): replaysSessionSampleRate: 0.25, replaysOnErrorSampleRate: 1.0`,
-      description:
-        "Record user sessions to visualize errors in context. See exactly what the user did before, during, and after an error.",
-      name: "Session Replay",
-      setup:
-        "Add replayIntegration() to the integrations array in instrumentation-client.ts (client-side only). Configure replaysSessionSampleRate and replaysOnErrorSampleRate. Session Replay only works in the browser, not on the server.",
-      slug: "session-replay",
-    },
-    {
-      code: `// instrumentation-client.ts - for browser profiling
-import * as Sentry from "@sentry/nextjs";
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-  tracesSampleRate: 1.0,
-  profilesSampleRate: 1.0,
-  integrations: [Sentry.browserProfilingIntegration()],
-});
-
-// sentry.server.config.ts - for server profiling
-import * as Sentry from "@sentry/nextjs";
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-  tracesSampleRate: 1.0,
-  profileSessionSampleRate: 1.0,
-});`,
-      description:
-        "Identify slow or resource-intensive functions on both client and server.",
-      name: "Profiling",
-      setup:
-        "For browser profiling, add browserProfilingIntegration() to instrumentation-client.ts and set profilesSampleRate. For server profiling, set profileSessionSampleRate in sentry.server.config.ts. Both require tracing to be enabled.",
-      slug: "profiling",
-    },
-    {
-      code: `// Using Sentry.cron.instrumentCron with the "cron" library:
-import * as Sentry from "@sentry/nextjs";
-import { CronJob } from "cron";
-
-const CronJobWithCheckIn = Sentry.cron.instrumentCron(CronJob, "my-cron-job");
-const job = new CronJobWithCheckIn("* * * * *", () => {
-  console.log("Task runs every minute");
-});
-
-// Using withMonitor for manual monitoring:
-Sentry.withMonitor("my-monitor-slug", () => {
-  // Your scheduled task logic here
-});
-
-// Using check-ins for granular control:
-const checkInId = Sentry.captureCheckIn({
-  monitorSlug: "my-monitor-slug",
-  status: "in_progress",
-});
-
-// ... execute your task ...
-
-Sentry.captureCheckIn({
-  checkInId,
-  monitorSlug: "my-monitor-slug",
-  status: "ok", // or "error"
-});
-
-// Vercel Cron Jobs: set automaticVercelMonitors in next.config.ts
-// (currently only works with Pages Router)`,
-      description:
-        "Monitor cron jobs and scheduled tasks. Get alerts when jobs fail, run too long, or don't run at all.",
-      name: "Cron Monitoring",
-      setup:
-        "Cron monitoring is only supported in Server and Edge runtimes for Next.js. Use Sentry.cron.instrumentCron() to wrap cron libraries, Sentry.withMonitor() for manual monitoring, or captureCheckIn() for granular control. For Vercel Cron Jobs, set automaticVercelMonitors: true in next.config.ts (Pages Router only).",
-      slug: "crons",
-    },
-    {
-      code: `// instrumentation-client.ts
-import * as Sentry from "@sentry/nextjs";
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-  integrations: [
-    Sentry.feedbackIntegration({
-      // Placement and appearance:
-      colorScheme: "system", // "system" | "light" | "dark"
-      // Screenshot support (enabled by default on desktop, disabled on mobile):
-      enableScreenshot: true,
-    }),
+  "gettingStarted": "# Sentry Next.js SDK — Getting Started\n\n## Installation\n\nRun the Sentry wizard to automatically configure Sentry in your Next.js application:\n\n```bash\nnpx @sentry/wizard@latest -i nextjs\n```\n\nThe wizard will prompt you to select features (Error Monitoring, Logs, Session Replay, Tracing) and will automatically create and modify all required files.\n\n## Files Created by the Wizard\n\n### `instrumentation-client.ts` (Browser)\n\n```typescript\nimport * as Sentry from \"@sentry/nextjs\";\n\nSentry.init({\n  dsn: \"___PUBLIC_DSN___\",\n  sendDefaultPii: true,\n  tracesSampleRate: process.env.NODE_ENV === \"development\" ? 1.0 : 0.1,\n  replaysSessionSampleRate: 0.1,\n  replaysOnErrorSampleRate: 1.0,\n  enableLogs: true,\n  integrations: [\n    Sentry.replayIntegration(),\n  ],\n});\n```\n\n### `sentry.server.config.ts` (Node.js)\n\n```typescript\nimport * as Sentry from \"@sentry/nextjs\";\n\nSentry.init({\n  dsn: \"___PUBLIC_DSN___\",\n  sendDefaultPii: true,\n  tracesSampleRate: process.env.NODE_ENV === \"development\" ? 1.0 : 0.1,\n  enableLogs: true,\n});\n```\n\n### `sentry.edge.config.ts` (Edge Runtime)\n\n```typescript\nimport * as Sentry from \"@sentry/nextjs\";\n\nSentry.init({\n  dsn: \"___PUBLIC_DSN___\",\n  sendDefaultPii: true,\n  tracesSampleRate: process.env.NODE_ENV === \"development\" ? 1.0 : 0.1,\n  enableLogs: true,\n});\n```\n\n### `instrumentation.ts` (Server-Side Registration)\n\n```typescript\nimport * as Sentry from \"@sentry/nextjs\";\n\nexport async function register() {\n  if (process.env.NEXT_RUNTIME === \"nodejs\") {\n    await import(\"./sentry.server.config\");\n  }\n\n  if (process.env.NEXT_RUNTIME === \"edge\") {\n    await import(\"./sentry.edge.config\");\n  }\n}\n\nexport const onRequestError = Sentry.captureRequestError;\n```\n\n### `next.config.ts`\n\n```typescript\nimport { withSentryConfig } from \"@sentry/nextjs\";\n\nexport default withSentryConfig(nextConfig, {\n  org: \"___ORG_SLUG___\",\n  project: \"___PROJECT_SLUG___\",\n  authToken: process.env.SENTRY_AUTH_TOKEN,\n  tunnelRoute: \"/monitoring\",\n  silent: !process.env.CI,\n});\n```\n\n### `app/global-error.tsx` (React Error Boundary)\n\n```tsx\n\"use client\";\n\nimport * as Sentry from \"@sentry/nextjs\";\nimport { useEffect } from \"react\";\n\nexport default function GlobalError({\n  error,\n}: {\n  error: Error & { digest?: string };\n}) {\n  useEffect(() => {\n    Sentry.captureException(error);\n  }, [error]);\n\n  return (\n    <html>\n      <body>\n        <h1>Something went wrong!</h1>\n      </body>\n    </html>\n  );\n}\n```\n\n## Source Maps\n\nAdd your auth token to `.env.sentry-build-plugin` for local development:\n\n```bash\nSENTRY_AUTH_TOKEN=sntrys_eyJ...\n```\n\nFor CI/CD, set `SENTRY_AUTH_TOKEN` as an environment variable in your build system.\n\n## Verify Your Setup\n\nStart your dev server and visit the test page:\n\n```bash\nnpm run dev\n```\n\nNavigate to `http://localhost:3000/sentry-example-page` and click \"Throw Sample Error\" to verify errors, traces, replays, and logs are flowing into Sentry.\n\n## Sending Logs\n\n```typescript\nimport * as Sentry from \"@sentry/nextjs\";\n\nSentry.logger.info(\"User action\", { userId: \"123\" });\nSentry.logger.warn(\"Slow response\", { duration: 5000 });\nSentry.logger.error(\"Operation failed\", { reason: \"timeout\" });\n```\n",
+  "name": "Sentry Next.js SDK",
+  "packages": [
+    "@sentry/nextjs"
   ],
-});
-
-// The feedback widget appears as a button in the bottom-right corner by default.
-// When paired with Session Replay (replaysOnErrorSampleRate > 0),
-// it buffers up to 30 seconds of session data when users open the feedback widget.`,
-      description:
-        "Collect user feedback with an embedded widget. Users can report issues with optional screenshots.",
-      name: "User Feedback",
-      setup:
-        "Add feedbackIntegration() to the integrations array in instrumentation-client.ts (client-side only). The widget appears in the bottom-right corner by default. Requires browser support for Shadow DOM and Dialog elements. Requires SDK v7.85.0+.",
-      slug: "user-feedback",
-    },
-    {
-      code: `// instrumentation-client.ts
-import * as Sentry from "@sentry/nextjs";
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-  enableLogs: true,
-});
-
-// Use structured logging anywhere in your client or server code:
-Sentry.logger.info("User action completed", { userId: "123", action: "purchase" });
-Sentry.logger.warn("Slow API response", { endpoint: "/api/data", duration: 5000 });
-Sentry.logger.error("Payment failed", { orderId: "abc", reason: "insufficient_funds" });
-Sentry.logger.debug("Cache state", { hits: 42, misses: 3 });`,
-      description:
-        "Centralize and analyze your application logs. Correlate them with errors and performance issues.",
-      name: "Logs",
-      setup:
-        "Enable logs by setting enableLogs: true in your Sentry.init() call (both client and server configs). Use Sentry.logger.info(), .warn(), .error(), and .debug() to send structured logs.",
-      slug: "logs",
-    },
-  ],
-  gettingStarted: `Install the Sentry Next.js SDK using the wizard (recommended):
-
-\`\`\`bash
-npx @sentry/wizard@latest -i nextjs
-\`\`\`
-
-The wizard automatically creates all necessary configuration files. If you prefer manual setup, install the package:
-
-\`\`\`bash
-npm install @sentry/nextjs
-\`\`\`
-
-Then create the following files:
-
-**1. instrumentation-client.ts** (browser environment):
-
-\`\`\`typescript
-import * as Sentry from "@sentry/nextjs";
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-  tracesSampleRate: process.env.NODE_ENV === "development" ? 1.0 : 0.1,
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1.0,
-  integrations: [Sentry.replayIntegration()],
-});
-\`\`\`
-
-**2. sentry.server.config.ts** (Node.js server environment):
-
-\`\`\`typescript
-import * as Sentry from "@sentry/nextjs";
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-  tracesSampleRate: process.env.NODE_ENV === "development" ? 1.0 : 0.1,
-});
-\`\`\`
-
-**3. sentry.edge.config.ts** (edge runtime):
-
-\`\`\`typescript
-import * as Sentry from "@sentry/nextjs";
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-  tracesSampleRate: process.env.NODE_ENV === "development" ? 1.0 : 0.1,
-});
-\`\`\`
-
-**4. instrumentation.ts** (registers server and edge configs):
-
-\`\`\`typescript
-import * as Sentry from "@sentry/nextjs";
-
-export async function register() {
-  if (process.env.NEXT_RUNTIME === "nodejs") {
-    await import("./sentry.server.config");
-  }
-  if (process.env.NEXT_RUNTIME === "edge") {
-    await import("./sentry.edge.config");
-  }
-}
-
-export const onRequestError = Sentry.captureRequestError;
-\`\`\`
-
-**5. next.config.ts** (wrap with withSentryConfig):
-
-\`\`\`typescript
-import { withSentryConfig } from "@sentry/nextjs";
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  // your existing config
-};
-
-export default withSentryConfig(nextConfig, {
-  org: "___ORG_SLUG___",
-  project: "___PROJECT_SLUG___",
-  // Auth token for source map uploads
-  authToken: process.env.SENTRY_AUTH_TOKEN,
-  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers
-  tunnelRoute: "/monitoring",
-  silent: !process.env.CI,
-});
-\`\`\`
-
-**6. app/global-error.tsx** (catch React rendering errors):
-
-\`\`\`tsx
-"use client";
-
-import * as Sentry from "@sentry/nextjs";
-import NextError from "next/error";
-import { useEffect } from "react";
-
-export default function GlobalError({
-  error,
-}: {
-  error: Error & { digest?: string };
-}) {
-  useEffect(() => {
-    Sentry.captureException(error);
-  }, [error]);
-
-  return (
-    <html>
-      <body>
-        <NextError statusCode={0} />
-      </body>
-    </html>
-  );
-}
-\`\`\`
-
-**7. Environment variables:**
-
-Create \`.env.sentry-build-plugin\`:
-\`\`\`
-SENTRY_AUTH_TOKEN=your-auth-token
-\`\`\`
-
-Or set \`SENTRY_AUTH_TOKEN\` in your CI environment for source map uploads.`,
-  name: "Next.js",
-  packages: ["@sentry/nextjs"],
-  rank: 10,
-  slug: "nextjs",
+  "rank": 10,
+  "slug": "nextjs"
 };
 
 export default nextjs;

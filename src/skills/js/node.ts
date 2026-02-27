@@ -1,135 +1,46 @@
 import type { SentrySkill } from "../../types";
 
 const node: SentrySkill = {
-  category: "runtime",
-  ecosystem: "javascript",
-  features: [
+  "category": "runtime",
+  "ecosystem": "javascript",
+  "features": [
     {
-      code: `const Sentry = require("@sentry/node");
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-});
-
-// Manually capture an error
-Sentry.captureException(new Error("Something went wrong"));
-
-// Manually capture a message
-Sentry.captureMessage("Something happened");`,
-      description:
-        "Automatically captures unhandled exceptions and unhandled promise rejections.",
-      name: "Error Monitoring",
-      setup:
-        "Error monitoring is enabled by default when you call Sentry.init(). No additional configuration is needed. Unhandled exceptions and promise rejections are captured automatically.",
-      slug: "error-monitoring",
+      "code": "import * as Sentry from \"@sentry/node\";\n\nSentry.init({\n  dsn: \"___PUBLIC_DSN___\",\n  sendDefaultPii: true,\n});\n\n// Capture an error manually\ntry {\n  foo();\n} catch (e) {\n  Sentry.captureException(e);\n}",
+      "description": "Automatically capture errors, uncaught exceptions, and unhandled rejections in your Node.js application.",
+      "name": "Error Monitoring",
+      "setup": "Install @sentry/node with your package manager. Create an instrument.js file in the root of your project and call Sentry.init() with your DSN before requiring any other modules. For CommonJS, require('./instrument') at the top of your main file. For ESM, use the --import ./instrument.mjs flag when starting Node.",
+      "slug": "error-monitoring"
     },
     {
-      code: `const Sentry = require("@sentry/node");
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-  // Set tracesSampleRate to 1.0 to capture 100% of transactions for tracing.
-  // We recommend adjusting this value in production.
-  tracesSampleRate: 1.0,
-});`,
-      description:
-        "Track performance across your application with distributed tracing. Follow requests from frontend to backend.",
-      name: "Tracing",
-      setup:
-        "Enable tracing by setting tracesSampleRate in your Sentry.init() call. The Node.js SDK automatically instruments HTTP requests, database queries, and other common operations.",
-      slug: "tracing",
+      "code": "import * as Sentry from \"@sentry/node\";\n\nSentry.init({\n  dsn: \"___PUBLIC_DSN___\",\n  sendDefaultPii: true,\n  tracesSampleRate: 1.0,\n});\n\n// Create a performance trace\nSentry.startSpan(\n  {\n    op: \"test\",\n    name: \"My First Test Transaction\",\n  },\n  () => {\n    setTimeout(() => {\n      try {\n        foo();\n      } catch (e) {\n        Sentry.captureException(e);\n      }\n    }, 99);\n  },\n);",
+      "description": "Track software performance and measure the time taken for code execution using distributed tracing.",
+      "name": "Tracing",
+      "setup": "Install @sentry/node and set tracesSampleRate in your Sentry.init() call. Create an instrument.js file with the init configuration and load it before all other modules. Use Sentry.startSpan() to create custom spans in your application code.",
+      "slug": "tracing"
     },
     {
-      code: `const Sentry = require("@sentry/node");
-const { nodeProfilingIntegration } = require("@sentry/profiling-node");
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-  tracesSampleRate: 1.0,
-  // Enable profiling
-  profileSessionSampleRate: 1.0,
-  integrations: [nodeProfilingIntegration()],
-});`,
-      description:
-        "Identify slow or resource-intensive functions without custom instrumentation.",
-      name: "Profiling",
-      setup:
-        "Install @sentry/profiling-node alongside @sentry/node. Add the nodeProfilingIntegration() to your integrations and set profileSessionSampleRate. Profiling requires tracing to be enabled.",
-      slug: "profiling",
+      "code": "import * as Sentry from \"@sentry/node\";\nimport { nodeProfilingIntegration } from \"@sentry/profiling-node\";\n\nSentry.init({\n  dsn: \"___PUBLIC_DSN___\",\n  sendDefaultPii: true,\n  integrations: [\n    nodeProfilingIntegration(),\n  ],\n  tracesSampleRate: 1.0,\n  profileSessionSampleRate: 1.0,\n});",
+      "description": "Gain deeper insight into slow or resource-intensive functions in your Node.js app without custom instrumentation.",
+      "name": "Profiling",
+      "setup": "Install both @sentry/node and @sentry/profiling-node packages. Import nodeProfilingIntegration from @sentry/profiling-node and add it to the integrations array in Sentry.init(). Set profileSessionSampleRate to control what percentage of sessions are profiled.",
+      "slug": "profiling"
     },
     {
-      code: `const Sentry = require("@sentry/node");
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-  enableLogs: true,
-});
-
-// Use structured logging
-Sentry.logger.info("User logged in", { userId: "123" });
-Sentry.logger.warn("Slow query detected", { duration: 5000 });
-Sentry.logger.error("Operation failed", { reason: "timeout" });
-Sentry.logger.debug("Cache miss", { key: "user:123" });`,
-      description:
-        "Centralize and analyze your application logs. Correlate them with errors and performance issues.",
-      name: "Logs",
-      setup:
-        "Enable logs by setting enableLogs: true in your Sentry.init() call. Use Sentry.logger.info(), .warn(), .error(), and .debug() to send structured logs.",
-      slug: "logs",
-    },
+      "code": "import * as Sentry from \"@sentry/node\";\n\nSentry.init({\n  dsn: \"___PUBLIC_DSN___\",\n  sendDefaultPii: true,\n  enableLogs: true,\n});\n\n// Use Sentry logger\nconst { logger } = Sentry;\nlogger.info(\"User logged in\", { userId: 123 });\nlogger.error(\"Something went wrong\", { error: \"details\" });",
+      "description": "Send structured application logs to Sentry to correlate them with errors and performance issues.",
+      "name": "Logs",
+      "setup": "Install @sentry/node and set enableLogs: true in your Sentry.init() call. Create an instrument.js file with the init configuration and load it before all other modules. Use Sentry.logger to emit structured log entries at various severity levels.",
+      "slug": "logs"
+    }
   ],
-  gettingStarted: `Install the Sentry Node.js SDK:
-
-\`\`\`bash
-npm install @sentry/node
-\`\`\`
-
-Create an \`instrument.js\` file in your project root. This file MUST be loaded before any other modules:
-
-\`\`\`javascript
-const Sentry = require("@sentry/node");
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-  tracesSampleRate: 1.0,
-});
-\`\`\`
-
-Import this file at the very top of your application entry point:
-
-\`\`\`javascript
-require("./instrument");
-// ... rest of your application
-\`\`\`
-
-For ESM projects, create \`instrument.mjs\`:
-
-\`\`\`javascript
-import * as Sentry from "@sentry/node";
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-  tracesSampleRate: 1.0,
-});
-\`\`\`
-
-And run your application with:
-
-\`\`\`bash
-node --import ./instrument.mjs app.mjs
-\`\`\`
-
-Requires Node.js 18.0.0 or higher (18.19.0+ or 19.9.0+ recommended).`,
-  name: "Node.js",
-  packages: ["@sentry/node", "@sentry/profiling-node"],
-  rank: 3,
-  slug: "node",
+  "gettingStarted": "## Getting Started with Sentry for Node.js\n\n### Prerequisites\n\n- A Sentry account and project\n- Node.js version 18.0.0 or above (>= 19.9.0 or 18.19.0 recommended)\n\n### Step 1: Install\n\n```bash\nnpm install @sentry/node\n```\n\n### Step 2: Configure\n\nCreate a file named `instrument.js` (or `instrument.mjs` for ESM) in the root directory of your project:\n\n**CommonJS (`instrument.js`)**\n```js\nconst Sentry = require(\"@sentry/node\");\n\n// Ensure to call this before requiring any other modules!\nSentry.init({\n  dsn: \"___PUBLIC_DSN___\",\n  sendDefaultPii: true,\n  tracesSampleRate: 1.0,\n  enableLogs: true,\n});\n```\n\n**ESM (`instrument.mjs`)**\n```js\nimport * as Sentry from \"@sentry/node\";\n\n// Ensure to call this before importing any other modules!\nSentry.init({\n  dsn: \"___PUBLIC_DSN___\",\n  sendDefaultPii: true,\n  tracesSampleRate: 1.0,\n  enableLogs: true,\n});\n```\n\n### Step 3: Apply Instrumentation\n\n**CommonJS** — Require `instrument.js` before any other modules in your main file:\n\n```js\n// app.js\n// Require this first!\nrequire(\"./instrument\");\n\n// Now require other modules\nconst http = require(\"http\");\n\n// Your application code goes here\n```\n\n**ESM** — Use the `--import` flag when starting your application:\n\n```bash\n# Note: This is only available for Node v18.19.0 onwards.\nnode --import ./instrument.mjs app.mjs\n```\n\n### Step 4: Add Source Maps (Optional)\n\nUpload source maps so stack traces map back to your original code:\n\n```bash\nnpx @sentry/wizard@latest -i sourcemaps\n```\n\n### Step 5: Verify Your Setup\n\nAdd the following snippet to your main application file to trigger a test error:\n\n```js\nsetTimeout(() => {\n  try {\n    foo();\n  } catch (e) {\n    Sentry.captureException(e);\n  }\n}, 99);\n```\n\nRun your application and check your Sentry project's **Issues** page to confirm the error was captured.",
+  "name": "Node.js",
+  "packages": [
+    "@sentry/node",
+    "@sentry/profiling-node"
+  ],
+  "rank": 3,
+  "slug": "node"
 };
 
 export default node;
