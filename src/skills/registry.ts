@@ -22,35 +22,67 @@ const categoryPriority: Record<string, number> = {
 };
 
 export function resolveSkills(libs: string[]) {
-  const matched = libs
-    .filter((lib) => lib in skills)
-    .map((lib) => skills[lib])
-    .sort((a, b) => {
-      const catDiff =
-        (categoryPriority[b.category] ?? 0) -
-        (categoryPriority[a.category] ?? 0);
-      if (catDiff !== 0) {
-        return catDiff;
-      }
-      return b.rank - a.rank;
-    });
+  const unmatchedLibs = libs.filter((lib) => !(lib in skills));
+  const matched = libs.filter((lib) => lib in skills).map((lib) => skills[lib]);
+
+  // Ecosystem filtering: if libs span multiple ecosystems, pick the one
+  // with the most matched libs and treat the rest as ecosystem-mismatched.
+  const ecosystemCounts: Record<string, number> = {};
+  for (const skill of matched) {
+    ecosystemCounts[skill.ecosystem] =
+      (ecosystemCounts[skill.ecosystem] ?? 0) + 1;
+  }
+
+  let dominantEcosystem: string | null = null;
+  let maxCount = 0;
+  for (const [eco, count] of Object.entries(ecosystemCounts)) {
+    if (count > maxCount) {
+      maxCount = count;
+      dominantEcosystem = eco;
+    }
+  }
+
+  const ecosystemFiltered = matched.filter(
+    (s) => s.ecosystem === dominantEcosystem
+  );
+  const ecosystemMismatchedLibs = matched
+    .filter((s) => s.ecosystem !== dominantEcosystem)
+    .map((s) => s.slug);
+
+  const sorted = ecosystemFiltered.sort((a, b) => {
+    const catDiff =
+      (categoryPriority[b.category] ?? 0) - (categoryPriority[a.category] ?? 0);
+    if (catDiff !== 0) {
+      return catDiff;
+    }
+    return b.rank - a.rank;
+  });
 
   return {
-    dominant: matched[0] ?? null,
-    secondary: matched.slice(1),
+    dominant: sorted[0] ?? null,
+    secondary: sorted.slice(1),
+    unmatchedLibs,
+    ecosystemMismatchedLibs,
   };
 }
 
 export function getAvailableFeatures(libs: string[]) {
-  const { dominant, secondary } = resolveSkills(libs);
-  const unmatchedLibs = libs.filter((lib) => !(lib in skills));
+  const { dominant, secondary, unmatchedLibs, ecosystemMismatchedLibs } =
+    resolveSkills(libs);
+
+  // Combine truly unknown libs and ecosystem-mismatched libs into unmatchedLibs
+  const allUnmatchedLibs = [...unmatchedLibs, ...ecosystemMismatchedLibs];
 
   if (!dominant) {
     return {
       dominantLib: null,
       features: [],
       matchedLibs: [] as string[],
-      unmatchedLibs,
+      unmatchedLibs: allUnmatchedLibs,
+      ...(ecosystemMismatchedLibs.length > 0 && {
+        ecosystemNote:
+          "Cross-ecosystem mixing is not supported. Libraries from different ecosystems (JavaScript/Python) were ignored.",
+      }),
     };
   }
 
@@ -81,7 +113,11 @@ export function getAvailableFeatures(libs: string[]) {
     dominantLib: dominant.slug,
     features,
     matchedLibs: allSkills.map((s) => s.slug),
-    unmatchedLibs,
+    unmatchedLibs: allUnmatchedLibs,
+    ...(ecosystemMismatchedLibs.length > 0 && {
+      ecosystemNote:
+        "Cross-ecosystem mixing is not supported. Libraries from different ecosystems (JavaScript/Python) were ignored.",
+    }),
   };
 }
 

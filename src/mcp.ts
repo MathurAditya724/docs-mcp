@@ -71,7 +71,8 @@ export function createMcpServer() {
       title: "Get Sentry Integration Docs",
     },
     ({ features, libs }) => {
-      const { dominant, secondary } = resolveSkills(libs);
+      const { dominant, secondary, unmatchedLibs, ecosystemMismatchedLibs } =
+        resolveSkills(libs);
 
       if (!dominant) {
         return {
@@ -82,6 +83,11 @@ export function createMcpServer() {
                   error:
                     "No matching Sentry skills found. Use get-available-features first to see supported libraries.",
                   knownLibs: Object.keys(skills),
+                  unmatchedLibs,
+                  ...(ecosystemMismatchedLibs.length > 0 && {
+                    ecosystemNote:
+                      "Cross-ecosystem mixing is not supported. Libraries from different ecosystems (JavaScript/Python) were ignored.",
+                  }),
                 },
                 null,
                 2
