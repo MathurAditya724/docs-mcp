@@ -57,6 +57,50 @@ app.get("/", (c) => {
         "Set enableLogs: true in the runtime SDK's Sentry.init(). Use Sentry.logger methods (info, warn, error, etc.) within your Hono route handlers.",
       slug: "logs",
     },
+    {
+      code: `import * as Sentry from "@sentry/node"; // or @sentry/bun, @sentry/cloudflare
+
+// Using Sentry.withMonitor() to wrap a scheduled task
+Sentry.withMonitor("<monitor-slug>", () => {
+  // Execute your scheduled task here...
+});
+
+// Or use captureCheckIn for manual check-in control
+const checkInId = Sentry.captureCheckIn({
+  monitorSlug: "<monitor-slug>",
+  status: "in_progress",
+});
+
+// ... run task ...
+
+Sentry.captureCheckIn({
+  checkInId,
+  monitorSlug: "<monitor-slug>",
+  status: "ok",
+});`,
+      description:
+        "Monitor periodic and scheduled tasks to detect missed, late, or failed executions. Uses the runtime SDK's crons API.",
+      name: "Crons",
+      setup:
+        "Use Sentry.withMonitor() or Sentry.captureCheckIn() from the runtime SDK (@sentry/node, @sentry/bun, or @sentry/cloudflare). On Node.js, you can also use Sentry.cron.instrumentCron/instrumentNodeCron/instrumentNodeSchedule helpers to auto-instrument popular cron libraries.",
+      slug: "crons",
+    },
+    {
+      code: `import * as Sentry from "@sentry/node"; // or @sentry/bun, @sentry/cloudflare
+
+// Collect feedback programmatically
+Sentry.captureFeedback({
+  name: "Jane Doe",
+  email: "jane@example.com",
+  message: "Something broke when I clicked submit.",
+});`,
+      description:
+        "Collect user feedback from your Hono application using the runtime SDK's programmatic API.",
+      name: "User Feedback",
+      setup:
+        "Use Sentry.captureFeedback() from the runtime SDK to collect and send user feedback programmatically. You can optionally pass an associatedEventId to link feedback to a specific error event.",
+      slug: "user-feedback",
+    },
   ],
   gettingStarted: `## Hono + Sentry Setup
 
