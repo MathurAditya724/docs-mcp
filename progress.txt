@@ -53,3 +53,14 @@ Task 8: DONE
 - Registered hono in the skills record (alphabetical order alongside existing skills)
 - Verified build succeeds with wrangler deploy --dry-run (1196.60 KiB output)
 - Commit: feat: register hono skill in skills registry
+
+Task 9: DONE
+- Created src/skills/python/fastapi.ts with a FastAPI skill
+- Category is "framework", ecosystem is "python", rank 8 (between flask at 7 and django at 10)
+- Fetched actual Sentry docs from https://docs.sentry.io/platforms/python/integrations/fastapi/ for accurate content
+- Features: error-monitoring, tracing, profiling, logs, crons — matching what Sentry supports for Python/FastAPI
+- gettingStarted covers install, init, app creation, verification, and optional explicit FastApiIntegration + StarletteIntegration config (FastAPI is built on Starlette, so both must be instantiated)
+- Packages: ["sentry-sdk"] (standard Python SDK)
+- Documents key options: transaction_style, failed_request_status_codes, middleware_spans, http_methods_to_capture
+- Verified build succeeds with wrangler deploy --dry-run (1196.60 KiB output)
+- Commit: feat: add fastapi skill to src/skills/python/fastapi.ts
