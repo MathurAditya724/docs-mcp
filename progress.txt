@@ -1,0 +1,17 @@
+Task 1: DONE
+- Refactored getAvailableFeatures() in src/skills/registry.ts to compute unmatchedLibs (libs not found in the skills registry) and include it in both the success and no-match return paths
+- Updated src/mcp.ts error response to use dynamic Object.keys(skills) instead of a hardcoded (and stale) knownLibs array, and to include unmatchedLibs
+- Commit: feat: add unmatchedLibs to get-available-features response
+
+Task 2: DONE
+- Removed import of generateDocs from src/agent.ts in src/mcp.ts
+- Replaced async generateDocs() LLM call with synchronous deterministic JSON assembly
+- get-docs now returns structured JSON matching the PRD schema: { stack, packages, gettingStarted, features, secondaryPatterns }
+- gettingStarted comes from the dominant skill, features are deduplicated (dominant takes priority), secondaryPatterns hold library-specific wiring from secondary skills
+- Error responses now return structured JSON with knownLibs instead of plain text
+- Commit: feat: refactor get-docs to return structured JSON instead of calling LLM
+
+Task 3: DONE
+- Removed src/agent.ts entirely — it contained the LLM call (generateDocs using @ai-sdk/anthropic and generateText) which is no longer used after Task 2
+- Verified no other files import from agent.ts or reference generateDocs
+- Commit: chore: remove src/agent.ts (unused LLM call module)
