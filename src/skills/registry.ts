@@ -1,6 +1,7 @@
 import type { SentrySkill } from "../types";
 import bun from "./js/bun";
 import cloudflare from "./js/cloudflare";
+import hono from "./js/hono";
 import nextjs from "./js/nextjs";
 import node from "./js/node";
 import django from "./python/django";
@@ -11,6 +12,7 @@ const skills: Record<string, SentrySkill> = {
   cloudflare,
   django,
   flask,
+  hono,
   nextjs,
   node,
 };
