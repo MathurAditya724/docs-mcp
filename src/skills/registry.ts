@@ -37,11 +37,28 @@ export function resolveSkills(libs: string[]) {
       (ecosystemCounts[skill.ecosystem] ?? 0) + 1;
   }
 
+  // Pick the ecosystem with the most matched libs.
+  // Tie-break by highest total rank (sum of categoryPriority * rank), then alphabetically.
   let dominantEcosystem: string | null = null;
   let maxCount = 0;
+  let maxRankSum = 0;
   for (const [eco, count] of Object.entries(ecosystemCounts)) {
-    if (count > maxCount) {
+    const rankSum = matched
+      .filter((s) => s.ecosystem === eco)
+      .reduce(
+        (sum, s) => sum + (categoryPriority[s.category] ?? 0) * s.rank,
+        0
+      );
+    if (
+      count > maxCount ||
+      (count === maxCount && rankSum > maxRankSum) ||
+      (count === maxCount &&
+        rankSum === maxRankSum &&
+        dominantEcosystem !== null &&
+        eco < dominantEcosystem)
+    ) {
       maxCount = count;
+      maxRankSum = rankSum;
       dominantEcosystem = eco;
     }
   }

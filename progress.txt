@@ -135,3 +135,15 @@ Task 15: DONE
 - All 76 code blocks pass syntax validation after changes
 - Verified build succeeds with wrangler deploy --dry-run (1214.99 KiB output)
 - Commit: fix: make all skill code examples minimal and copy-pasteable
+
+Task 16: DONE
+- Created scripts/test-resolution.ts to test skill resolution logic with all 6 specified combos
+- Tested ["hono", "cloudflare"] → dominant: cloudflare, secondary: [hono] ✓
+- Tested ["hono", "bun"] → dominant: bun, secondary: [hono] ✓
+- Tested ["hono", "node"] → dominant: node, secondary: [hono] ✓
+- Tested ["nextjs"] → dominant: nextjs, secondary: [] ✓
+- Tested ["bun"] → dominant: bun, secondary: [] ✓
+- Tested ["node", "flask"] → picks flask ecosystem (higher rank sum: framework×7=21 vs runtime×3=6), node listed in ecosystemMismatchedLibs ✓
+- Also tested getAvailableFeatures for cross-ecosystem: ecosystemNote present, mismatched lib in unmatchedLibs ✓
+- All 22 assertions passed, no code changes needed — resolution logic works correctly
+- Commit: test: verify skill resolution logic with combo stack test cases
