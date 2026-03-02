@@ -47,3 +47,9 @@ Task 7: DONE
 - Notes deprecated @hono/sentry community middleware, directs users to official Sentry SDKs per Sentry docs
 - Verified build succeeds with wrangler deploy --dry-run (1193.02 KiB output)
 - Commit: feat: add hono skill to src/skills/js/hono.ts
+
+Task 8: DONE
+- Added import of hono skill from ./js/hono in src/skills/registry.ts
+- Registered hono in the skills record (alphabetical order alongside existing skills)
+- Verified build succeeds with wrangler deploy --dry-run (1196.60 KiB output)
+- Commit: feat: register hono skill in skills registry
