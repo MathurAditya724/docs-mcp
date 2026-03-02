@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { generateDocs } from "./agent";
-import { getAvailableFeatures, resolveSkills } from "./skills/registry";
+import { getAvailableFeatures, resolveSkills, skills } from "./skills/registry";
 
 export function createMcpServer() {
   const mcp = new McpServer({
@@ -33,7 +33,8 @@ export function createMcpServer() {
                 {
                   error:
                     "No matching Sentry skills found for the provided libraries.",
-                  knownLibs: ["nextjs", "hono", "bun", "node", "flask"],
+                  knownLibs: Object.keys(skills),
+                  unmatchedLibs: result.unmatchedLibs,
                 },
                 null,
                 2

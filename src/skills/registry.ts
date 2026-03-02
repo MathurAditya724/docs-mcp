@@ -43,8 +43,15 @@ export function resolveSkills(libs: string[]) {
 
 export function getAvailableFeatures(libs: string[]) {
   const { dominant, secondary } = resolveSkills(libs);
+  const unmatchedLibs = libs.filter((lib) => !(lib in skills));
+
   if (!dominant) {
-    return { dominantLib: null, features: [], matchedLibs: [] as string[] };
+    return {
+      dominantLib: null,
+      features: [],
+      matchedLibs: [] as string[],
+      unmatchedLibs,
+    };
   }
 
   const allSkills = [dominant, ...secondary];
@@ -74,6 +81,7 @@ export function getAvailableFeatures(libs: string[]) {
     dominantLib: dominant.slug,
     features,
     matchedLibs: allSkills.map((s) => s.slug),
+    unmatchedLibs,
   };
 }
 
