@@ -37,3 +37,13 @@ Task 6: DONE
 - Updated get-docs handler in src/mcp.ts to propagate ecosystem mismatch info in error responses
 - Verified build succeeds with wrangler deploy --dry-run (1193.02 KiB output)
 - Commit: feat: add ecosystem filtering to resolveSkills() for cross-ecosystem lib handling
+
+Task 7: DONE
+- Created src/skills/js/hono.ts with a Hono skill
+- Category is "library" (ranks below runtimes and frameworks), packages array is empty (runtime provides the Sentry package)
+- Hono does NOT have its own Sentry SDK — the skill describes wiring Sentry via the runtime SDK (@sentry/node, @sentry/bun, or @sentry/cloudflare)
+- gettingStarted covers all three runtimes (Node.js, Cloudflare Workers, Bun) with init examples
+- Features: error-monitoring, tracing, logs — each showing Hono-specific patterns (route handlers, onError auto-capture)
+- Notes deprecated @hono/sentry community middleware, directs users to official Sentry SDKs per Sentry docs
+- Verified build succeeds with wrangler deploy --dry-run (1193.02 KiB output)
+- Commit: feat: add hono skill to src/skills/js/hono.ts
