@@ -29,3 +29,11 @@ Task 5: DONE
 - Confirmed no missing module errors or import failures after LLM code removal
 - Noted pre-existing TS2589 type depth error in tsc --noEmit (MCP SDK generic issue, not related to our changes, build unaffected since wrangler uses esbuild)
 - Commit: chore: verify MCP server builds and runs after LLM removal
+
+Task 6: DONE
+- Added ecosystem filtering to resolveSkills() in src/skills/registry.ts: when libs span multiple ecosystems (e.g. ["node", "flask"]), the ecosystem with the most matched libs wins and the rest are treated as ecosystem-mismatched
+- resolveSkills() now returns unmatchedLibs (unknown libs) and ecosystemMismatchedLibs (known libs from the wrong ecosystem) separately
+- Updated getAvailableFeatures() to merge both into unmatchedLibs and include an ecosystemNote when cross-ecosystem mixing is detected
+- Updated get-docs handler in src/mcp.ts to propagate ecosystem mismatch info in error responses
+- Verified build succeeds with wrangler deploy --dry-run (1193.02 KiB output)
+- Commit: feat: add ecosystem filtering to resolveSkills() for cross-ecosystem lib handling
