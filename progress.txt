@@ -161,3 +161,16 @@ Task 17: DONE
   - secondaryPatterns code correctly filters to only requested features ✓
 - All 66 assertions passed, no code changes needed — get-docs merges correctly
 - Commit: test: verify get-docs output merges correctly for combo stacks
+
+Task 18: DONE
+- Created scripts/test-edge-cases.ts with 55 assertions covering all edge cases
+- Edge case 1: Empty libs array [] — dominant: null, empty features/matchedLibs/unmatchedLibs, no crash
+- Edge case 2: All unknown libs ["express", "angular", "vue"] — dominant: null, all 3 in unmatchedLibs, no ecosystemNote
+- Edge case 3: Single known + multiple unknown ["node", "express", "koa"] — dominant: node, express/koa in unmatchedLibs, features available
+- Edge case 4: Single unknown ["express"] — dominant: null, express in unmatchedLibs
+- Edge case 5: Duplicate libs ["node", "node"] — works correctly, dominant: node
+- Edge case 6: Non-existent feature slugs — 0 matched features, no crash
+- Edge case 7: Mixed known/unknown with ecosystem mismatch ["node", "django", "express"] — all 3 libs accounted for across dominant/unmatchedLibs/ecosystemMismatchedLibs
+- No code changes needed — all edge cases already return sensible responses without crashing
+- All 55 assertions passed, build succeeds (1215.34 KiB output)
+- Commit: test: verify edge cases — empty libs, all unknown libs, known + unknown combos
