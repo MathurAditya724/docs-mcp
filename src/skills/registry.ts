@@ -5,12 +5,14 @@ import hono from "./js/hono";
 import nextjs from "./js/nextjs";
 import node from "./js/node";
 import django from "./python/django";
+import fastapi from "./python/fastapi";
 import flask from "./python/flask";
 
 const skills: Record<string, SentrySkill> = {
   bun,
   cloudflare,
   django,
+  fastapi,
   flask,
   hono,
   nextjs,
