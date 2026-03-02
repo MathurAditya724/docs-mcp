@@ -41,7 +41,7 @@ const flask: SentrySkill = {
       slug: "logs",
     },
     {
-      code: 'import sentry_sdk\nfrom sentry_sdk.crons import monitor\n\nsentry_sdk.init(\n    dsn="___PUBLIC_DSN___",\n    send_default_pii=True,\n)\n\n@monitor(monitor_slug="my-scheduled-task")\ndef run_scheduled_task():\n    # Your periodic task logic here\n    pass',
+      code: 'import sentry_sdk\nfrom sentry_sdk.crons import monitor\n\nsentry_sdk.init(\n    dsn="___PUBLIC_DSN___",\n    send_default_pii=True,\n)\n\n@monitor(monitor_slug="daily-cleanup")\ndef run_scheduled_task():\n    db.session.query(ExpiredSession).delete()\n    db.session.commit()',
       description:
         "Monitor periodic and scheduled tasks to detect missed, late, or failed executions.",
       name: "Crons",
@@ -50,7 +50,7 @@ const flask: SentrySkill = {
       slug: "crons",
     },
     {
-      code: 'import sentry_sdk\nfrom flask import render_template\n\n@app.errorhandler(500)\ndef server_error_handler(error):\n    return render_template("500.html",\n        sentry_event_id=sentry_sdk.last_event_id(),\n    ), 500\n\n# In your 500.html template:\n# <script src="https://browser.sentry-cdn.com/10.41.0/bundle.min.js" crossorigin="anonymous"></script>\n# <script>\n#   Sentry.init({ dsn: "___PUBLIC_DSN___" });\n#   Sentry.showReportDialog({ eventId: "{{ sentry_event_id }}" });\n# </script>',
+      code: 'import sentry_sdk\nfrom flask import Flask, render_template\n\napp = Flask(__name__)\n\n@app.errorhandler(500)\ndef server_error_handler(error):\n    return render_template("500.html",\n        sentry_event_id=sentry_sdk.last_event_id(),\n    ), 500\n\n# In your 500.html template:\n# <script src="https://browser.sentry-cdn.com/10.41.0/bundle.min.js" crossorigin="anonymous"></script>\n# <script>\n#   Sentry.init({ dsn: "___PUBLIC_DSN___" });\n#   Sentry.showReportDialog({ eventId: "{{ sentry_event_id }}" });\n# </script>',
       description:
         "Collect user feedback when errors occur in your Flask application using the Crash-Report modal.",
       name: "User Feedback",

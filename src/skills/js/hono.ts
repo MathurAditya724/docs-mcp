@@ -20,17 +20,17 @@ app.get("/debug-sentry", () => {
       slug: "error-monitoring",
     },
     {
-      code: `import * as Sentry from "@sentry/node"; // or @sentry/bun, @sentry/cloudflare
+      code: `import { Hono } from "hono";
+import * as Sentry from "@sentry/node"; // or @sentry/bun, @sentry/cloudflare
 
-app.get("/debug-sentry", async () => {
-  await Sentry.startSpan(
-    {
-      op: "test",
-      name: "My First Test Transaction",
-    },
+const app = new Hono();
+
+app.get("/users/:id", async (c) => {
+  return await Sentry.startSpan(
+    { op: "db.query", name: "fetch user" },
     async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      throw new Error("My first Sentry error!");
+      const user = await db.query("SELECT * FROM users WHERE id = ?", [c.req.param("id")]);
+      return c.json(user);
     },
   );
 });`,
@@ -42,8 +42,10 @@ app.get("/debug-sentry", async () => {
       slug: "tracing",
     },
     {
-      code: `import * as Sentry from "@sentry/node"; // or @sentry/bun, @sentry/cloudflare
+      code: `import { Hono } from "hono";
+import * as Sentry from "@sentry/node"; // or @sentry/bun, @sentry/cloudflare
 
+const app = new Hono();
 const { logger } = Sentry;
 
 app.get("/", (c) => {
@@ -60,22 +62,19 @@ app.get("/", (c) => {
     {
       code: `import * as Sentry from "@sentry/node"; // or @sentry/bun, @sentry/cloudflare
 
-// Using Sentry.withMonitor() to wrap a scheduled task
-Sentry.withMonitor("<monitor-slug>", () => {
-  // Execute your scheduled task here...
+Sentry.withMonitor("daily-cleanup", async () => {
+  await db.deleteExpiredSessions();
 });
 
-// Or use captureCheckIn for manual check-in control
+// Or use captureCheckIn for manual control
 const checkInId = Sentry.captureCheckIn({
-  monitorSlug: "<monitor-slug>",
+  monitorSlug: "daily-cleanup",
   status: "in_progress",
 });
-
-// ... run task ...
-
+await runTask();
 Sentry.captureCheckIn({
   checkInId,
-  monitorSlug: "<monitor-slug>",
+  monitorSlug: "daily-cleanup",
   status: "ok",
 });`,
       description:

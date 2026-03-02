@@ -14,7 +14,7 @@ const bun: SentrySkill = {
       slug: "error-monitoring",
     },
     {
-      code: 'import * as Sentry from "@sentry/bun";\n\nSentry.init({\n  dsn: "___PUBLIC_DSN___",\n  sendDefaultPii: true,\n  tracesSampleRate: 1.0,\n});\n\n// Wrap your code in a span to measure performance\nSentry.startSpan(\n  {\n    op: "test",\n    name: "My First Test Transaction",\n  },\n  () => {\n    // Your code here\n  },\n);',
+      code: 'import * as Sentry from "@sentry/bun";\n\nSentry.init({\n  dsn: "___PUBLIC_DSN___",\n  sendDefaultPii: true,\n  tracesSampleRate: 1.0,\n});\n\nSentry.startSpan({ op: "task", name: "my-task" }, async () => {\n  await fetch("https://example.com/api");\n});',
       description:
         "Track software performance and distributed tracing to follow requests across multiple systems in your Bun application.",
       name: "Tracing",
@@ -32,7 +32,7 @@ const bun: SentrySkill = {
       slug: "logs",
     },
     {
-      code: 'import * as Sentry from "@sentry/bun";\n\n// Using Sentry.withMonitor() to wrap a scheduled task\nSentry.withMonitor("<monitor-slug>", () => {\n  // Execute your scheduled task here...\n});\n\n// Or instrument the cron library directly\nimport { CronJob } from "cron";\nconst CronJobWithCheckIn = Sentry.cron.instrumentCron(CronJob, "my-cron-job");\nconst job = new CronJobWithCheckIn("* * * * *", () => {\n  console.log("Running every minute");\n});',
+      code: 'import * as Sentry from "@sentry/bun";\n\nSentry.withMonitor("daily-cleanup", async () => {\n  await db.deleteExpiredSessions();\n});\n\n// Or auto-instrument the cron library\nimport { CronJob } from "cron";\nconst CronJobWithCheckIn = Sentry.cron.instrumentCron(CronJob, "my-cron-job");\nconst job = new CronJobWithCheckIn("* * * * *", () => {\n  processQueue();\n});',
       description:
         "Monitor periodic and scheduled tasks in your Bun application to detect missed, late, or failed executions. Supports cron, node-cron, node-schedule libraries and manual check-ins.",
       name: "Crons",

@@ -14,7 +14,7 @@ const cloudflare: SentrySkill = {
       slug: "error-monitoring",
     },
     {
-      code: 'import * as Sentry from "@sentry/cloudflare";\n\nexport default Sentry.withSentry(\n  (env: Env) => ({\n    dsn: "___PUBLIC_DSN___",\n    sendDefaultPii: true,\n    tracesSampleRate: 1.0,\n  }),\n  {\n    async fetch(request, env, ctx) {\n      const url = new URL(request.url);\n      if (url.pathname === "/debug-sentry") {\n        await Sentry.startSpan(\n          {\n            op: "test",\n            name: "My First Test Transaction",\n          },\n          async () => {\n            await new Promise((resolve) => setTimeout(resolve, 100));\n            throw new Error("My first Sentry error!");\n          },\n        );\n      }\n      return new Response("Hello World!");\n    },\n  },\n);',
+      code: 'import * as Sentry from "@sentry/cloudflare";\n\nexport default Sentry.withSentry(\n  (env: Env) => ({\n    dsn: "___PUBLIC_DSN___",\n    sendDefaultPii: true,\n    tracesSampleRate: 1.0,\n  }),\n  {\n    async fetch(request, env, ctx) {\n      return await Sentry.startSpan(\n        { op: "http.handler", name: "handle request" },\n        async () => {\n          const data = await env.DB.prepare("SELECT * FROM users").all();\n          return Response.json(data.results);\n        },\n      );\n    },\n  },\n);',
       description:
         "Track software performance and measure span durations across your Cloudflare Workers and Pages with distributed tracing.",
       name: "Tracing",
@@ -32,7 +32,7 @@ const cloudflare: SentrySkill = {
       slug: "logs",
     },
     {
-      code: 'import * as Sentry from "@sentry/cloudflare";\n\n// Using Sentry.withMonitor() to wrap a scheduled task\nSentry.withMonitor("<monitor-slug>", () => {\n  // Execute your scheduled task here...\n});\n\n// Or use captureCheckIn for manual check-in control\nconst checkInId = Sentry.captureCheckIn({\n  monitorSlug: "<monitor-slug>",\n  status: "in_progress",\n});\n\n// ... run task ...\n\nSentry.captureCheckIn({\n  checkInId,\n  monitorSlug: "<monitor-slug>",\n  status: "ok",\n});',
+      code: 'import * as Sentry from "@sentry/cloudflare";\n\nSentry.withMonitor("daily-cleanup", async () => {\n  await env.DB.prepare("DELETE FROM sessions WHERE expired_at < datetime(\'now\')").run();\n});\n\n// Or use captureCheckIn for manual control\nconst checkInId = Sentry.captureCheckIn({\n  monitorSlug: "daily-cleanup",\n  status: "in_progress",\n});\nawait runTask();\nSentry.captureCheckIn({\n  checkInId,\n  monitorSlug: "daily-cleanup",\n  status: "ok",\n});',
       description:
         "Monitor periodic and scheduled tasks in Cloudflare Workers to detect missed, late, or failed executions.",
       name: "Crons",

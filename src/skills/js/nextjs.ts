@@ -50,7 +50,7 @@ const nextjs: SentrySkill = {
       slug: "profiling",
     },
     {
-      code: 'import * as Sentry from "@sentry/nextjs";\n\n// Using Sentry.withMonitor() to wrap a scheduled task\nSentry.withMonitor("<monitor-slug>", () => {\n  // Execute your scheduled task here...\n});\n\n// Or use captureCheckIn for manual check-in control\nconst checkInId = Sentry.captureCheckIn({\n  monitorSlug: "<monitor-slug>",\n  status: "in_progress",\n});\n\n// ... run task ...\n\nSentry.captureCheckIn({\n  checkInId,\n  monitorSlug: "<monitor-slug>",\n  status: "ok",\n});',
+      code: 'import * as Sentry from "@sentry/nextjs";\n\nSentry.withMonitor("daily-cleanup", async () => {\n  await db.deleteExpiredSessions();\n});\n\n// Or use captureCheckIn for manual control\nconst checkInId = Sentry.captureCheckIn({\n  monitorSlug: "daily-cleanup",\n  status: "in_progress",\n});\nawait runTask();\nSentry.captureCheckIn({\n  checkInId,\n  monitorSlug: "daily-cleanup",\n  status: "ok",\n});',
       description:
         "Monitor periodic and scheduled tasks in your Next.js server to detect missed, late, or failed executions. Supports Vercel Cron Jobs, node-cron, node-schedule, and manual check-ins.",
       name: "Crons",
