@@ -81,3 +81,14 @@ Task 11: DONE
 - Bun skill: verified accurate — `bun add @sentry/bun`, `--preload` flag, features (error-monitoring, tracing, logs) match docs, no profiling (correct — V8 CpuProfiler is Node-only)
 - Verified build succeeds with wrangler deploy --dry-run (1202.75 KiB output)
 - Commit: fix: update nextjs profiling to use profileSessionSampleRate and nodeProfilingIntegration
+
+Task 12: DONE
+- Fetched actual Sentry docs for all 3 Python skills: django, flask, fastapi
+- Compared each skill's content against official docs at https://docs.sentry.io/platforms/python/integrations/{slug}/
+- Also cross-referenced https://docs.sentry.io/platforms/python/crons/ for crons feature
+- Django: verified init config, DjangoIntegration options (transaction_style, middleware_spans, signals_spans, signals_denylist, cache_spans, http_methods_to_capture) all match docs. Added missing crons feature with @monitor decorator, mentions management commands and Celery Beat auto-instrumentation
+- Flask: verified init config, FlaskIntegration options (transaction_style, http_methods_to_capture) all match docs. Added missing crons feature with @monitor decorator
+- FastAPI: verified init config, StarletteIntegration/FastApiIntegration options (transaction_style, failed_request_status_codes, middleware_spans, http_methods_to_capture) all match docs. Already had crons feature — no changes needed
+- All three Python skills now have: error-monitoring, tracing, profiling, logs, crons
+- Verified build succeeds with wrangler deploy --dry-run (1204.32 KiB output)
+- Commit: fix: add missing crons feature to django and flask skills
