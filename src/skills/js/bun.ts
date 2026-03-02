@@ -5,7 +5,7 @@ const bun: SentrySkill = {
   ecosystem: "javascript",
   features: [
     {
-      code: 'import * as Sentry from "@sentry/bun";\n\nSentry.init({\n  dsn: "___PUBLIC_DSN___",\n  sendDefaultPii: true,\n});\n\n// Capture an error manually\ntry {\n  foo();\n} catch (e) {\n  Sentry.captureException(e);\n}',
+      code: 'import * as Sentry from "@sentry/bun";\n\nSentry.init({\n  dsn: "___PUBLIC_DSN___",\n  sendDefaultPii: true,\n});\n\n// Capture an error manually\ntry {\n  throw new Error("Test error");\n} catch (e) {\n  Sentry.captureException(e);\n}',
       description:
         "Automatically capture errors, uncaught exceptions, and unhandled rejections in your Bun application.",
       name: "Error Monitoring",
@@ -14,7 +14,7 @@ const bun: SentrySkill = {
       slug: "error-monitoring",
     },
     {
-      code: 'import * as Sentry from "@sentry/bun";\n\nSentry.init({\n  dsn: "___PUBLIC_DSN___",\n  sendDefaultPii: true,\n  tracesSampleRate: 1.0,\n});\n\n// Wrap your code in a span to measure performance\nSentry.startSpan(\n  {\n    op: "test",\n    name: "My First Test Transaction",\n  },\n  () => {\n    setTimeout(() => {\n      try {\n        foo();\n      } catch (e) {\n        Sentry.captureException(e);\n      }\n    }, 99);\n  },\n);',
+      code: 'import * as Sentry from "@sentry/bun";\n\nSentry.init({\n  dsn: "___PUBLIC_DSN___",\n  sendDefaultPii: true,\n  tracesSampleRate: 1.0,\n});\n\n// Wrap your code in a span to measure performance\nSentry.startSpan(\n  {\n    op: "test",\n    name: "My First Test Transaction",\n  },\n  () => {\n    // Your code here\n  },\n);',
       description:
         "Track software performance and distributed tracing to follow requests across multiple systems in your Bun application.",
       name: "Tracing",
@@ -51,7 +51,7 @@ const bun: SentrySkill = {
     },
   ],
   gettingStarted:
-    '# Sentry for Bun - Getting Started\n\n## Step 1: Install\n\n```bash\nbun add @sentry/bun\n```\n\n## Step 2: Configure\n\nCreate a file named `instrument.js` in the root directory of your project:\n\n```javascript\n// instrument.js\nimport * as Sentry from "@sentry/bun";\n\n// Ensure to call this before importing any other modules!\nSentry.init({\n  dsn: "___PUBLIC_DSN___",\n  // Adds request headers and IP for users\n  sendDefaultPii: true,\n  // Performance Monitoring\n  tracesSampleRate: 1.0, // Capture 100% of transactions; adjust in production\n  // Enable logs to be sent to Sentry\n  enableLogs: true,\n});\n```\n\n## Step 3: Apply Instrumentation\n\nPreload your instrumentation file using the `--preload` flag when starting your app:\n\n```bash\nbun --preload ./instrument.js app.js\n```\n\n> **Note:** Sentry\'s auto-instrumentation does not work with bundled code, including Bun\'s single-file executables. If you need to bundle your application, you\'ll need to manually instrument your code.\n\n## Step 4: Add Source Maps (Optional)\n\n```bash\nnpx @sentry/wizard@latest -i sourcemaps\n```\n\n## Step 5: Verify Your Setup\n\nAdd the following to your main application file to test error capture:\n\n```javascript\nimport * as Sentry from "@sentry/bun";\n\n// Test error monitoring\nsetTimeout(() => {\n  try {\n    foo();\n  } catch (e) {\n    Sentry.captureException(e);\n  }\n}, 99);\n\n// Test tracing\nSentry.startSpan(\n  {\n    op: "test",\n    name: "My First Test Transaction",\n  },\n  () => {\n    setTimeout(() => {\n      try {\n        foo();\n      } catch (e) {\n        Sentry.captureException(e);\n      }\n    }, 99);\n  },\n);\n```\n\nHead over to your Sentry project to view the captured data on the Issues, Traces, and Logs pages.',
+    '# Sentry for Bun - Getting Started\n\n## Step 1: Install\n\n```bash\nbun add @sentry/bun\n```\n\n## Step 2: Configure\n\nCreate a file named `instrument.js` in the root directory of your project:\n\n```javascript\n// instrument.js\nimport * as Sentry from "@sentry/bun";\n\n// Ensure to call this before importing any other modules!\nSentry.init({\n  dsn: "___PUBLIC_DSN___",\n  // Adds request headers and IP for users\n  sendDefaultPii: true,\n  // Performance Monitoring\n  tracesSampleRate: 1.0, // Capture 100% of transactions; adjust in production\n  // Enable logs to be sent to Sentry\n  enableLogs: true,\n});\n```\n\n## Step 3: Apply Instrumentation\n\nPreload your instrumentation file using the `--preload` flag when starting your app:\n\n```bash\nbun --preload ./instrument.js app.js\n```\n\n> **Note:** Sentry\'s auto-instrumentation does not work with bundled code, including Bun\'s single-file executables. If you need to bundle your application, you\'ll need to manually instrument your code.\n\n## Step 4: Add Source Maps (Optional)\n\n```bash\nnpx @sentry/wizard@latest -i sourcemaps\n```\n\n## Step 5: Verify Your Setup\n\nAdd the following to your main application file to test error capture:\n\n```javascript\nimport * as Sentry from "@sentry/bun";\n\n// Trigger a test error\nthrow new Error("Sentry Bun test");\n```\n\nRun your app and check your Sentry project\'s Issues page to confirm the error was captured.',
   name: "Bun",
   packages: ["@sentry/bun"],
   rank: 3,

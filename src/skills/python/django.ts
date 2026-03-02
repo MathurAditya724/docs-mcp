@@ -50,7 +50,7 @@ const django: SentrySkill = {
       slug: "crons",
     },
     {
-      code: 'import sentry_sdk\nfrom django.shortcuts import render\n\n@app.errorhandler(500)\ndef server_error(request):\n    return render(request, "500.html", {\n        "sentry_event_id": sentry_sdk.last_event_id(),\n    }, status=500)\n\n# In your 500.html template:\n# <script src="https://browser.sentry-cdn.com/10.41.0/bundle.min.js" crossorigin="anonymous"></script>\n# <script>\n#   Sentry.init({ dsn: "___PUBLIC_DSN___" });\n#   Sentry.showReportDialog({ eventId: "{{ sentry_event_id }}" });\n# </script>',
+      code: 'import sentry_sdk\nfrom django.shortcuts import render\n\n# views.py\ndef handler500(request):\n    return render(request, "500.html", {\n        "sentry_event_id": sentry_sdk.last_event_id(),\n    }, status=500)\n\n# urls.py\n# handler500 = "myapp.views.handler500"\n\n# In your 500.html template:\n# <script src="https://browser.sentry-cdn.com/10.41.0/bundle.min.js" crossorigin="anonymous"></script>\n# <script>\n#   Sentry.init({ dsn: "___PUBLIC_DSN___" });\n#   Sentry.showReportDialog({ eventId: "{{ sentry_event_id }}" });\n# </script>',
       description:
         "Collect user feedback when errors occur in your Django application using the Crash-Report modal.",
       name: "User Feedback",
