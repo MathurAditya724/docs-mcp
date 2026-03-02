@@ -70,3 +70,14 @@ Task 10: DONE
 - Registered fastapi in the skills record (alphabetical order alongside existing skills)
 - Verified build succeeds with wrangler deploy --dry-run (1202.68 KiB output)
 - Commit: feat: register fastapi skill in skills registry
+
+Task 11: DONE
+- Fetched actual Sentry docs for all 4 JS skills: nextjs, cloudflare, node, bun
+- Compared each skill's content against official docs at https://docs.sentry.io/platforms/javascript/guides/{slug}/
+- Found 1 issue: Next.js profiling feature used deprecated `profilesSampleRate` API instead of current `profileSessionSampleRate`
+- Fixed Next.js profiling: added `@sentry/profiling-node` import with `nodeProfilingIntegration()`, updated to `profileSessionSampleRate`, added note that profiling is server-side only
+- Cloudflare skill: verified accurate — withSentry() for Workers, sentryPagesPlugin() for Pages, features (error-monitoring, tracing, logs) match docs
+- Node.js skill: verified accurate — profiling already uses correct `profileSessionSampleRate` and `nodeProfilingIntegration()`, features match docs
+- Bun skill: verified accurate — `bun add @sentry/bun`, `--preload` flag, features (error-monitoring, tracing, logs) match docs, no profiling (correct — V8 CpuProfiler is Node-only)
+- Verified build succeeds with wrangler deploy --dry-run (1202.75 KiB output)
+- Commit: fix: update nextjs profiling to use profileSessionSampleRate and nodeProfilingIntegration
