@@ -147,3 +147,17 @@ Task 16: DONE
 - Also tested getAvailableFeatures for cross-ecosystem: ecosystemNote present, mismatched lib in unmatchedLibs ✓
 - All 22 assertions passed, no code changes needed — resolution logic works correctly
 - Commit: test: verify skill resolution logic with combo stack test cases
+
+Task 17: DONE
+- Created scripts/test-get-docs.ts to verify get-docs output for combo stacks
+- Tested 8 scenarios covering all combo patterns from the PRD:
+  - ["hono", "cloudflare"] with error-monitoring, tracing, logs → gettingStarted from cloudflare, features from cloudflare, hono in secondaryPatterns ✓
+  - ["hono", "bun"] with error-monitoring, tracing → gettingStarted from bun, features from bun, hono in secondaryPatterns ✓
+  - ["hono", "node"] with error-monitoring, tracing, logs → gettingStarted from node, features from node, hono in secondaryPatterns ✓
+  - ["nextjs"] with 5 features → all from nextjs, no secondary patterns ✓
+  - ["bun"] with 2 features → all from bun, no secondary patterns ✓
+  - ["node", "flask"] cross-ecosystem → picks one ecosystem, no secondary patterns ✓
+  - Feature deduplication: dominant skill features always win over secondary ✓
+  - secondaryPatterns code correctly filters to only requested features ✓
+- All 66 assertions passed, no code changes needed — get-docs merges correctly
+- Commit: test: verify get-docs output merges correctly for combo stacks
