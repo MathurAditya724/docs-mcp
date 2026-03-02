@@ -110,3 +110,16 @@ Task 13: DONE
   - django/flask/fastapi: 6/7 each (no session-replay — server-side only)
 - Verified build succeeds with wrangler deploy --dry-run (1215.87 KiB output)
 - Commits: feat: add crons and user-feedback features to hono skill; feat: ensure all skills cover all Sentry-supported features
+
+Task 14: DONE
+- Created/updated scripts/validate-code-examples.ts to extract and syntax-validate all code examples from skills
+- JS/TS code validated using Bun's Transpiler (transformSync with tsx loader)
+- Python code validated using python3 py_compile module
+- Found and fixed 4 issues across skills:
+  - node.ts: replaced undefined foo() calls in error-monitoring and tracing code with throw new Error() / clean examples
+  - bun.ts: same foo() fix in error-monitoring and tracing, plus simplified verify snippet in gettingStarted
+  - nextjs.ts: fixed next.config.ts gettingStarted code block to include NextConfig type import and variable declaration
+  - django.ts: fixed user-feedback code that incorrectly used Flask's @app.errorhandler(500) decorator instead of Django's handler500 function pattern
+- All 76 code blocks (across 8 skills) now pass syntax validation: 0 errors
+- Verified build succeeds with wrangler deploy --dry-run (1215.44 KiB output)
+- Commit: fix: validate and fix syntax errors in all skill code examples
