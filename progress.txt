@@ -15,3 +15,17 @@ Task 3: DONE
 - Removed src/agent.ts entirely — it contained the LLM call (generateDocs using @ai-sdk/anthropic and generateText) which is no longer used after Task 2
 - Verified no other files import from agent.ts or reference generateDocs
 - Commit: chore: remove src/agent.ts (unused LLM call module)
+
+Task 4: DONE
+- Removed @ai-sdk/anthropic and ai from dependencies in package.json
+- Verified no src/ files import these packages (only scripts/generate-skills.ts references them, which is not part of the deployed server per PRD)
+- Ran bun install to update bun.lock (2 packages removed)
+- Commit: chore: remove @ai-sdk/anthropic and ai dependencies
+
+Task 5: DONE
+- Verified wrangler deploy --dry-run builds successfully (1191.57 KiB output, no errors)
+- Verified wrangler dev starts and serves on localhost without errors ("Ready on http://localhost:8788")
+- Verified /mcp endpoint responds (returns proper MCP protocol 406 for missing Accept headers, not a crash)
+- Confirmed no missing module errors or import failures after LLM code removal
+- Noted pre-existing TS2589 type depth error in tsc --noEmit (MCP SDK generic issue, not related to our changes, build unaffected since wrangler uses esbuild)
+- Commit: chore: verify MCP server builds and runs after LLM removal
