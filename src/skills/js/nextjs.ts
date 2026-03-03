@@ -13,32 +13,34 @@ const nextjs: SentrySkill = {
       slug: "error-monitoring",
     },
     {
-      code: "tracesSampleRate: 0.1,",
+      code: "",
       description: "Distributed tracing across all runtimes.",
       name: "Tracing",
-      setup: "Add tracesSampleRate to Sentry.init().",
+      setup: "Already configured: tracesSampleRate in gettingStarted init.",
       slug: "tracing",
     },
     {
-      code: "replaysSessionSampleRate: 0.1,\nreplaysOnErrorSampleRate: 1.0,\nintegrations: [Sentry.replayIntegration()],",
+      code: "",
       description: "Browser session replays. Client-side only.",
       name: "Session Replay",
-      setup: "Add to Sentry.init() in instrumentation-client.ts.",
+      setup:
+        "Already configured: replaysSessionSampleRate, replaysOnErrorSampleRate, replayIntegration() in gettingStarted client init.",
       slug: "session-replay",
     },
     {
-      code: 'enableLogs: true,\n\nSentry.logger.info("User action", { userId: "123" });',
+      code: 'Sentry.logger.info("User action", { userId: "123" });',
       description: "Structured logs correlated with errors and traces.",
       name: "Logs",
-      setup: "Set enableLogs: true in Sentry.init().",
+      setup:
+        "Already configured: enableLogs in gettingStarted init. Use Sentry.logger.*() to emit logs.",
       slug: "logs",
     },
     {
-      code: 'import { nodeProfilingIntegration } from "@sentry/profiling-node";\n\nintegrations: [nodeProfilingIntegration()],\nprofileSessionSampleRate: 1.0,',
+      code: "",
       description: "V8 CpuProfiler profiling. Server-side only.",
       name: "Profiling",
       setup:
-        "Install @sentry/profiling-node. Add to sentry.server.config.ts. Requires tracing. Not available in browser/edge.",
+        "Install @sentry/profiling-node. Add to sentry.server.config.ts Sentry.init(): integrations: [nodeProfilingIntegration()], profileSessionSampleRate: 1.0. Requires tracing. Not available in browser/edge.",
       slug: "profiling",
     },
     {
@@ -50,11 +52,11 @@ const nextjs: SentrySkill = {
       slug: "crons",
     },
     {
-      code: 'integrations: [Sentry.feedbackIntegration({ colorScheme: "system" })],\n\nSentry.captureFeedback({ name: "Jane", email: "jane@example.com", message: "Bug report" });',
+      code: 'Sentry.captureFeedback({ name: "Jane", email: "jane@example.com", message: "Bug report" });',
       description: "User feedback via widget or API.",
       name: "User Feedback",
       setup:
-        "Widget: feedbackIntegration() in instrumentation-client.ts. API: Sentry.captureFeedback().",
+        'Widget: add feedbackIntegration({ colorScheme: "system" }) to instrumentation-client.ts Sentry.init(). API: Sentry.captureFeedback().',
       slug: "user-feedback",
     },
   ],

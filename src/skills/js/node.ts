@@ -13,26 +13,27 @@ const node: SentrySkill = {
       slug: "error-monitoring",
     },
     {
-      code: 'tracesSampleRate: 1.0,\n\nSentry.startSpan({ op: "task", name: "my-task" }, async () => {\n  await fetch("https://example.com/api");\n});',
+      code: 'Sentry.startSpan({ op: "task", name: "my-task" }, async () => {\n  await fetch("https://example.com/api");\n});',
       description: "Distributed tracing and performance monitoring.",
       name: "Tracing",
       setup:
-        "Set tracesSampleRate in Sentry.init(). Sentry.startSpan() for custom spans.",
+        "Already configured: tracesSampleRate in gettingStarted init. Sentry.startSpan() for custom spans.",
       slug: "tracing",
     },
     {
-      code: 'import { nodeProfilingIntegration } from "@sentry/profiling-node";\n\nintegrations: [nodeProfilingIntegration()],\nprofileSessionSampleRate: 1.0,',
+      code: "",
       description: "V8 CpuProfiler profiling.",
       name: "Profiling",
       setup:
-        "Install @sentry/profiling-node. Add to Sentry.init(). Requires tracing.",
+        "Install @sentry/profiling-node. Add to Sentry.init(): integrations: [nodeProfilingIntegration()], profileSessionSampleRate: 1.0. Requires tracing.",
       slug: "profiling",
     },
     {
-      code: 'enableLogs: true,\n\nSentry.logger.info("User logged in", { userId: 123 });',
+      code: 'Sentry.logger.info("User logged in", { userId: 123 });',
       description: "Structured logs correlated with errors and traces.",
       name: "Logs",
-      setup: "Set enableLogs: true in Sentry.init().",
+      setup:
+        "Already configured: enableLogs in gettingStarted init. Use Sentry.logger.*() to emit logs.",
       slug: "logs",
     },
     {

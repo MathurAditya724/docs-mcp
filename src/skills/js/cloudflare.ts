@@ -13,18 +13,19 @@ const cloudflare: SentrySkill = {
       slug: "error-monitoring",
     },
     {
-      code: 'tracesSampleRate: 1.0,\n\nawait Sentry.startSpan({ op: "db.query", name: "fetch users" }, async () => {\n  return await env.DB.prepare("SELECT * FROM users").all();\n});',
+      code: 'await Sentry.startSpan({ op: "db.query", name: "fetch users" }, async () => {\n  return await env.DB.prepare("SELECT * FROM users").all();\n});',
       description: "Distributed tracing. CPU-bound spans show 0ms in Workers.",
       name: "Tracing",
       setup:
-        "Add tracesSampleRate to config. Sentry.startSpan() for custom spans.",
+        "Already configured: tracesSampleRate in gettingStarted init. Sentry.startSpan() for custom spans.",
       slug: "tracing",
     },
     {
-      code: 'enableLogs: true,\n\nSentry.logger.info("Worker received request", { url: request.url });',
+      code: 'Sentry.logger.info("Worker received request", { url: request.url });',
       description: "Structured logs correlated with errors and traces.",
       name: "Logs",
-      setup: "Set enableLogs: true in config.",
+      setup:
+        "Already configured: enableLogs in gettingStarted init. Use Sentry.logger.*() to emit logs.",
       slug: "logs",
     },
     {

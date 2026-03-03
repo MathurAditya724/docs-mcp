@@ -13,26 +13,27 @@ const fastapi: SentrySkill = {
       slug: "error-monitoring",
     },
     {
-      code: 'traces_sample_rate=1.0,\n\nfrom sentry_sdk.integrations.starlette import StarletteIntegration\nfrom sentry_sdk.integrations.fastapi import FastApiIntegration\nintegrations=[\n    StarletteIntegration(transaction_style="endpoint"),\n    FastApiIntegration(transaction_style="endpoint"),\n]',
+      code: 'with sentry_sdk.start_transaction(op="task", name="my-task"):\n    do_work()',
       description: "Auto-traces middleware, DB, Redis.",
       name: "Tracing",
       setup:
-        "Set traces_sample_rate. Options: transaction_style, failed_request_status_codes, middleware_spans, http_methods_to_capture. Both StarletteIntegration + FastApiIntegration needed.",
+        "Already configured: traces_sample_rate in gettingStarted init. Optional init options via StarletteIntegration() + FastApiIntegration(): transaction_style, failed_request_status_codes, middleware_spans, http_methods_to_capture.",
       slug: "tracing",
     },
     {
-      code: 'profile_session_sample_rate=1.0,\nprofile_lifecycle="trace",',
+      code: "",
       description: "Code-level profiling. Requires tracing.",
       name: "Profiling",
       setup:
-        "Add profile_session_sample_rate and profile_lifecycle to init(). Requires traces_sample_rate > 0.",
+        "Already configured: profile_session_sample_rate and profile_lifecycle in gettingStarted init. Requires traces_sample_rate > 0.",
       slug: "profiling",
     },
     {
-      code: 'enable_logs=True,\n\nimport logging\nlogger = logging.getLogger(__name__)\nlogger.info("Request processed")',
+      code: 'import logging\nlogger = logging.getLogger(__name__)\nlogger.info("Request processed")',
       description: "Python logger messages sent to Sentry.",
       name: "Logs",
-      setup: "Set enable_logs=True. LoggingIntegration auto-enabled.",
+      setup:
+        "Already configured: enable_logs in gettingStarted init. LoggingIntegration auto-enabled. Use standard logging module.",
       slug: "logs",
     },
     {
