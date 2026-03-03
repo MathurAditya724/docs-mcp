@@ -11,9 +11,15 @@ const TASK_PATTERN = /(?:task\s*)?(\d+)/i;
 
 const PROMPT = [
   "Read PRD.md and progress.txt in the project root.",
+  "progress.txt is your memory between runs. Read it carefully before starting — it contains completed tasks, failed attempts, learnings, and issues from previous runs.",
   "Find the next incomplete task and implement it.",
   "Commit your changes with a clear message.",
-  "Update progress.txt with what you did.",
+  "After EVERY attempt (success or failure), update progress.txt with:",
+  "  - Task number and status (DONE, FAILED, or SKIPPED)",
+  "  - What you tried and what happened",
+  "  - Any errors, blockers, or unexpected behavior encountered",
+  "  - Key learnings or context the next agent will need to continue",
+  "This is critical — the next agent session starts fresh with no memory. progress.txt is the only way to pass knowledge forward.",
   "ONLY DO ONE TASK AT A TIME.",
   "If a task is marked as SKIPPED in progress.txt, skip it and move to the next one.",
   "If all tasks are complete or skipped, respond with: <ralph>COMPLETE</ralph>",
