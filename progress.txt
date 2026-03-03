@@ -198,3 +198,23 @@ Task 20: DONE
 - All existing tests pass: 22/22 resolution, 65/66 get-docs (1 pre-existing), 55/55 edge cases
 - Build output: 1181.73 KiB (slightly smaller than 1181.89 KiB from Task 19)
 - Commit: refactor: restructure skills so init code appears once in gettingStarted, not per feature
+
+Task 21: DONE
+- Created scripts/measure-tokens.ts to measure character count, word count, and estimated token count for get-docs output
+- Token estimation uses ~4 chars/token approximation (standard for mixed English + code)
+- Measured 10 test cases: 7 single-runtime (all features), 3 combo stacks
+- Single-runtime results (budget: 2000 tokens):
+  - nextjs (7 features): 3414 chars, ~854 tokens ✓
+  - node (6 features): 2377 chars, ~595 tokens ✓
+  - bun (5 features): 2056 chars, ~514 tokens ✓
+  - cloudflare (5 features): 2656 chars, ~664 tokens ✓
+  - django (6 features): 2774 chars, ~694 tokens ✓
+  - flask (6 features): 2562 chars, ~641 tokens ✓
+  - fastapi (6 features): 2858 chars, ~715 tokens ✓
+- Combo stack results (budget: 3000 tokens):
+  - hono+cloudflare (5 features): 4122 chars, ~1031 tokens ✓
+  - hono+bun (2 features): 2313 chars, ~579 tokens ✓
+  - hono+node (6 features): 3843 chars, ~961 tokens ✓
+- All 10 test cases comfortably within budget — largest single is 854 tokens (43% of 2000), largest combo is 1031 tokens (34% of 3000)
+- Build output unchanged at 1181.73 KiB
+- Commit: test: measure token count of get-docs output — all within budget
