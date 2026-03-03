@@ -10,7 +10,7 @@ const nextjs: SentrySkill = {
       name: "Error Monitoring",
       setup:
         "Configured by wizard. Manual capture with Sentry.captureException().",
-      slug: "error-monitoring",
+      slug: "errors",
     },
     {
       code: 'await Sentry.startSpan({ op: "db.query", name: "fetch-user" }, async () => {\n  return await prisma.user.findUnique({ where: { id } });\n});',
@@ -26,7 +26,7 @@ const nextjs: SentrySkill = {
       name: "Session Replay",
       setup:
         "Already configured: replaysSessionSampleRate, replaysOnErrorSampleRate, replayIntegration() in gettingStarted client init. Adjust sample rates to control volume.",
-      slug: "session-replay",
+      slug: "replay",
     },
     {
       code: 'Sentry.logger.info("User action", { userId: "123" });',

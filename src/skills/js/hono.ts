@@ -9,7 +9,7 @@ const hono: SentrySkill = {
       description: "Auto-captures unhandled exceptions. 3xx/4xx ignored.",
       name: "Error Monitoring",
       setup: "Init Sentry via runtime SDK before creating Hono app.",
-      slug: "error-monitoring",
+      slug: "errors",
     },
     {
       code: 'app.get("/users/:id", async (c) => {\n  return await Sentry.startSpan(\n    { op: "db.query", name: "fetch user" },\n    async () => {\n      const user = await db.query("SELECT * FROM users WHERE id = ?", [c.req.param("id")]);\n      return c.json(user);\n    },\n  );\n});',

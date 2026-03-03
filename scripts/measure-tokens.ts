@@ -121,9 +121,9 @@ const testCases: Array<{
     label: '["nextjs"] all 7 features',
     libs: ["nextjs"],
     features: [
-      "error-monitoring",
+      "errors",
       "tracing",
-      "session-replay",
+      "replay",
       "profiling",
       "logs",
       "crons",
@@ -135,7 +135,7 @@ const testCases: Array<{
     label: '["node"] all 6 features',
     libs: ["node"],
     features: [
-      "error-monitoring",
+      "errors",
       "tracing",
       "profiling",
       "logs",
@@ -147,20 +147,20 @@ const testCases: Array<{
   {
     label: '["bun"] all 5 features',
     libs: ["bun"],
-    features: ["error-monitoring", "tracing", "logs", "crons", "user-feedback"],
+    features: ["errors", "tracing", "logs", "crons", "user-feedback"],
     type: "single",
   },
   {
     label: '["cloudflare"] all 5 features',
     libs: ["cloudflare"],
-    features: ["error-monitoring", "tracing", "logs", "crons", "user-feedback"],
+    features: ["errors", "tracing", "logs", "crons", "user-feedback"],
     type: "single",
   },
   {
     label: '["django"] all 6 features',
     libs: ["django"],
     features: [
-      "error-monitoring",
+      "errors",
       "tracing",
       "profiling",
       "logs",
@@ -173,7 +173,7 @@ const testCases: Array<{
     label: '["flask"] all 6 features',
     libs: ["flask"],
     features: [
-      "error-monitoring",
+      "errors",
       "tracing",
       "profiling",
       "logs",
@@ -186,7 +186,7 @@ const testCases: Array<{
     label: '["fastapi"] all 6 features',
     libs: ["fastapi"],
     features: [
-      "error-monitoring",
+      "errors",
       "tracing",
       "profiling",
       "logs",
@@ -199,57 +199,51 @@ const testCases: Array<{
   {
     label: '["nextjs"] 5 features (no crons/feedback)',
     libs: ["nextjs"],
-    features: [
-      "error-monitoring",
-      "tracing",
-      "session-replay",
-      "logs",
-      "profiling",
-    ],
+    features: ["errors", "tracing", "replay", "logs", "profiling"],
     type: "single",
   },
   {
     label: '["django"] 3 features',
     libs: ["django"],
-    features: ["error-monitoring", "tracing", "profiling"],
+    features: ["errors", "tracing", "profiling"],
     type: "single",
   },
   {
     label: '["bun"] 2 features',
     libs: ["bun"],
-    features: ["error-monitoring", "tracing"],
+    features: ["errors", "tracing"],
     type: "single",
   },
   // ── Combo stacks (target: <3000 tokens) ──
   {
     label: '["hono","cloudflare"] all 5 features',
     libs: ["hono", "cloudflare"],
-    features: ["error-monitoring", "tracing", "logs", "crons", "user-feedback"],
+    features: ["errors", "tracing", "logs", "crons", "user-feedback"],
     type: "combo",
   },
   {
     label: '["hono","cloudflare"] 3 features',
     libs: ["hono", "cloudflare"],
-    features: ["error-monitoring", "tracing", "logs"],
+    features: ["errors", "tracing", "logs"],
     type: "combo",
   },
   {
     label: '["hono","cloudflare"] 1 feature',
     libs: ["hono", "cloudflare"],
-    features: ["error-monitoring"],
+    features: ["errors"],
     type: "combo",
   },
   {
     label: '["hono","bun"] 2 features',
     libs: ["hono", "bun"],
-    features: ["error-monitoring", "tracing"],
+    features: ["errors", "tracing"],
     type: "combo",
   },
   {
     label: '["hono","node"] all 6 features',
     libs: ["hono", "node"],
     features: [
-      "error-monitoring",
+      "errors",
       "tracing",
       "profiling",
       "logs",
@@ -261,21 +255,21 @@ const testCases: Array<{
   {
     label: '["hono","node"] 3 features',
     libs: ["hono", "node"],
-    features: ["error-monitoring", "tracing", "logs"],
+    features: ["errors", "tracing", "logs"],
     type: "combo",
   },
   // ── Cross-ecosystem (picks one, treated as single) ──
   {
     label: '["node","flask"] cross-eco 2 features',
     libs: ["node", "flask"],
-    features: ["error-monitoring", "tracing"],
+    features: ["errors", "tracing"],
     type: "single",
   },
   // ── Edge case: single known + unknown libs ──
   {
     label: '["node","express","koa"] 2 features',
     libs: ["node", "express", "koa"],
-    features: ["error-monitoring", "tracing"],
+    features: ["errors", "tracing"],
     type: "single",
   },
 ];

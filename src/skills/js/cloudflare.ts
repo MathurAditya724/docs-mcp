@@ -10,7 +10,7 @@ const cloudflare: SentrySkill = {
       name: "Error Monitoring",
       setup:
         "Configured by withSentry()/sentryPagesPlugin(). Manual: Sentry.captureException().",
-      slug: "error-monitoring",
+      slug: "errors",
     },
     {
       code: 'await Sentry.startSpan({ op: "db.query", name: "fetch users" }, async () => {\n  return await env.DB.prepare("SELECT * FROM users").all();\n});',

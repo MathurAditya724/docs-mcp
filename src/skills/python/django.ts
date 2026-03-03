@@ -10,7 +10,7 @@ const django: SentrySkill = {
       name: "Error Monitoring",
       setup:
         "Configured by init(). DjangoIntegration auto-enabled. Manual: capture_exception().",
-      slug: "error-monitoring",
+      slug: "errors",
     },
     {
       code: 'import sentry_sdk\n\nwith sentry_sdk.start_transaction(op="task", name="process-order"):\n    with sentry_sdk.start_span(name="fetch-order"):\n        order = Order.objects.get(pk=42)\n    with sentry_sdk.start_span(name="process"):\n        order.process()',

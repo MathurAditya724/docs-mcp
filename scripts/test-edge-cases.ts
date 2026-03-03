@@ -210,10 +210,10 @@ console.log('\nEdge Case 3b: getAvailableFeatures(["node", "express", "koa"])');
 
 // Simulate get-docs handler for single known + multiple unknown
 console.log(
-  '\nEdge Case 3c: get-docs with ["node", "express", "koa"], features: ["error-monitoring", "tracing"]'
+  '\nEdge Case 3c: get-docs with ["node", "express", "koa"], features: ["errors", "tracing"]'
 );
 {
-  const requestedFeatures = ["error-monitoring", "tracing"];
+  const requestedFeatures = ["errors", "tracing"];
   const { dominant, secondary, unmatchedLibs } = resolveSkills([
     "node",
     "express",

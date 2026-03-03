@@ -45,7 +45,7 @@ Given the libraries/frameworks in the user's codebase, returns all Sentry featur
   "matchedLibs": ["cloudflare", "hono"],
   "unmatchedLibs": [],
   "features": [
-    { "slug": "error-monitoring", "name": "Error Monitoring", "description": "...", "lib": "cloudflare" },
+    { "slug": "errors", "name": "Error Monitoring", "description": "...", "lib": "cloudflare" },
     { "slug": "tracing", "name": "Tracing", "description": "...", "lib": "cloudflare" },
     { "slug": "logs", "name": "Logs", "description": "...", "lib": "cloudflare" }
   ]
@@ -64,7 +64,7 @@ Given the user's libs and the features they want, returns a structured implement
 **Input:**
 
 ```json
-{ "libs": ["hono", "cloudflare"], "features": ["error-monitoring", "tracing", "logs"] }
+{ "libs": ["hono", "cloudflare"], "features": ["errors", "tracing", "logs"] }
 ```
 
 **Response:**
@@ -80,7 +80,7 @@ Given the user's libs and the features they want, returns a structured implement
   "gettingStarted": "## Cloudflare Workers & Pages Setup\n\n### Step 1: Install\n\n```bash\nnpm install @sentry/cloudflare --save\n```\n...",
   "features": [
     {
-      "slug": "error-monitoring",
+      "slug": "errors",
       "name": "Error Monitoring",
       "setup": "Install the @sentry/cloudflare package, add the nodejs_compat compatibility flag...",
       "code": "import * as Sentry from \"@sentry/cloudflare\";\n\nexport default Sentry.withSentry(...)",
@@ -116,12 +116,12 @@ Given the user's libs and the features they want, returns a structured implement
 
 | Slug | Ecosystem | Category | Sentry Package | Features |
 |------|-----------|----------|----------------|----------|
-| `nextjs` | JavaScript | framework | `@sentry/nextjs` | error-monitoring, tracing, session-replay, profiling, logs |
-| `cloudflare` | JavaScript | runtime | `@sentry/cloudflare` | error-monitoring, tracing, logs |
-| `node` | JavaScript | runtime | `@sentry/node` | error-monitoring, tracing, profiling, logs |
-| `bun` | JavaScript | runtime | `@sentry/bun` | error-monitoring, tracing, logs |
-| `django` | Python | framework | `sentry-sdk` | error-monitoring, tracing, profiling, logs |
-| `flask` | Python | framework | `sentry-sdk` | error-monitoring, tracing, profiling, logs |
+| `nextjs` | JavaScript | framework | `@sentry/nextjs` | errors, tracing, replay, profiling, logs |
+| `cloudflare` | JavaScript | runtime | `@sentry/cloudflare` | errors, tracing, logs |
+| `node` | JavaScript | runtime | `@sentry/node` | errors, tracing, profiling, logs |
+| `bun` | JavaScript | runtime | `@sentry/bun` | errors, tracing, logs |
+| `django` | Python | framework | `sentry-sdk` | errors, tracing, profiling, logs |
+| `flask` | Python | framework | `sentry-sdk` | errors, tracing, profiling, logs |
 
 ### Priority resolution
 
@@ -183,7 +183,7 @@ npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport 
 npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-available-features --tool-arg 'libs=["nextjs"]'
 
 # Call get-docs
-npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-docs --tool-arg 'libs=["nextjs"]' --tool-arg 'features=["error-monitoring", "tracing"]'
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-docs --tool-arg 'libs=["nextjs"]' --tool-arg 'features=["errors", "tracing"]'
 ```
 
 ## Deploy

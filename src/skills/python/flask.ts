@@ -10,7 +10,7 @@ const flask: SentrySkill = {
       name: "Error Monitoring",
       setup:
         "Configured by init(). FlaskIntegration auto-enabled. Manual: capture_exception().",
-      slug: "error-monitoring",
+      slug: "errors",
     },
     {
       code: 'import sentry_sdk\n\nwith sentry_sdk.start_transaction(op="task", name="send-email"):\n    with sentry_sdk.start_span(name="send-confirmation"):\n        msg = Message("Confirmation", recipients=["user@example.com"])\n        mail.send(msg)',

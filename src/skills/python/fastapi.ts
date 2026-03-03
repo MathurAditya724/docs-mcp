@@ -10,7 +10,7 @@ const fastapi: SentrySkill = {
       name: "Error Monitoring",
       setup:
         "Configured by init(). FastApiIntegration auto-enabled. Manual: capture_exception().",
-      slug: "error-monitoring",
+      slug: "errors",
     },
     {
       code: 'import sentry_sdk\n\nwith sentry_sdk.start_transaction(op="task", name="sync-data"):\n    with sentry_sdk.start_span(name="insert-log"):\n        database.execute("INSERT INTO sync_log (status) VALUES (:status)", {"status": "started"})',

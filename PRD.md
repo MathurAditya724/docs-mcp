@@ -30,7 +30,7 @@ Both tools must return predictable JSON. Define these shapes and stick to them.
   "matchedLibs": ["cloudflare", "hono"],
   "unmatchedLibs": ["express"],
   "features": [
-    { "slug": "error-monitoring", "name": "Error Monitoring", "description": "...", "lib": "cloudflare" }
+    { "slug": "errors", "name": "Error Monitoring", "description": "...", "lib": "cloudflare" }
   ]
 }
 ```
@@ -46,7 +46,7 @@ Both tools must return predictable JSON. Define these shapes and stick to them.
   "gettingStarted": "...(from dominant skill)...",
   "features": [
     {
-      "slug": "error-monitoring",
+      "slug": "errors",
       "name": "Error Monitoring",
       "setup": "...",
       "code": "...",
@@ -88,7 +88,7 @@ Both tools must return predictable JSON. Define these shapes and stick to them.
 
 - [ ] 11. For each JS skill (nextjs, cloudflare, node, bun), fetch the actual Sentry docs page and compare against the skill's content. Fix any outdated info, wrong code examples, or missing features. Docs URLs: `https://docs.sentry.io/platforms/javascript/guides/{slug}/`
 - [ ] 12. For each Python skill (django, flask, fastapi), fetch the actual Sentry docs and do the same comparison. Docs URLs: `https://docs.sentry.io/platforms/python/integrations/{slug}/`
-- [ ] 13. Ensure every skill covers ALL features that Sentry actually supports for that runtime/framework. Cross-reference the docs for features like: error-monitoring, tracing, session-replay, profiling, logs, crons, user-feedback. Add any that are missing
+- [ ] 13. Ensure every skill covers ALL features that Sentry actually supports for that runtime/framework. Cross-reference the docs for features like: errors, tracing, replay, profiling, logs, crons, user-feedback. Add any that are missing
 - [ ] 14. Verify all code examples are syntactically valid. For TypeScript skills, extract each `code` field and run it through `bun build --target=browser` or equivalent to catch syntax errors. Fix any broken examples
 - [ ] 15. Make sure code examples are minimal and correct — copy-pasteable, no placeholder functions like `foo()`, no undefined variables
 
@@ -120,10 +120,10 @@ Both tools must return predictable JSON. Define these shapes and stick to them.
   - `get-available-features(["bun"])` — dominant: bun
   - `get-available-features(["express", "node"])` — dominant: node, express in unmatchedLibs
   - `get-available-features(["node", "django"])` — picks one ecosystem, ignores the other
-  - `get-docs(["hono", "cloudflare"], ["error-monitoring", "tracing", "logs"])` — structured response, no LLM call, has secondaryPatterns for hono
-  - `get-docs(["nextjs"], ["error-monitoring", "tracing", "session-replay", "logs", "profiling"])` — full nextjs guide
-  - `get-docs(["hono", "bun"], ["error-monitoring", "tracing"])` — bun + hono patterns
-  - `get-docs(["django"], ["error-monitoring", "tracing", "profiling"])` — python stack
+  - `get-docs(["hono", "cloudflare"], ["errors", "tracing", "logs"])` — structured response, no LLM call, has secondaryPatterns for hono
+  - `get-docs(["nextjs"], ["errors", "tracing", "replay", "logs", "profiling"])` — full nextjs guide
+  - `get-docs(["hono", "bun"], ["errors", "tracing"])` — bun + hono patterns
+  - `get-docs(["django"], ["errors", "tracing", "profiling"])` — python stack
 - [ ] 23. Run the tests. For any failures, fix the skills or resolution logic. Re-run until all pass
 - [ ] 24. After tests pass, review `get-docs` output quality for each test case. Check: Could an AI agent follow this to set up Sentry correctly? Is it minimal? Are code examples correct?
 - [ ] 25. If output quality is lacking, improve the skills content or response assembly in `mcp.ts`. Re-run tests after every change
@@ -165,13 +165,13 @@ npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport 
 npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-available-features --tool-arg 'libs=["node", "django"]'
 
 # Test get-docs with single lib
-npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-docs --tool-arg 'libs=["nextjs"]' --tool-arg 'features=["error-monitoring", "tracing", "session-replay"]'
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-docs --tool-arg 'libs=["nextjs"]' --tool-arg 'features=["errors", "tracing", "replay"]'
 
 # Test get-docs with combo stack
-npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-docs --tool-arg 'libs=["hono", "cloudflare"]' --tool-arg 'features=["error-monitoring", "tracing", "logs"]'
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-docs --tool-arg 'libs=["hono", "cloudflare"]' --tool-arg 'features=["errors", "tracing", "logs"]'
 
 # Test get-docs with python stack
-npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-docs --tool-arg 'libs=["django"]' --tool-arg 'features=["error-monitoring", "tracing", "profiling"]'
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-docs --tool-arg 'libs=["django"]' --tool-arg 'features=["errors", "tracing", "profiling"]'
 ```
 
 Fix any issues found — wrong response shapes, missing fields, crashes, etc. Re-run until all commands return valid responses matching the schema defined above

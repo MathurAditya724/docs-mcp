@@ -132,15 +132,15 @@ function simulateGetDocs(
 }
 
 // =============================================================================
-// Test 1: ["hono", "cloudflare"] with error-monitoring, tracing, logs
+// Test 1: ["hono", "cloudflare"] with errors, tracing, logs
 // =============================================================================
 console.log(
-  '\nTest 1: get-docs(["hono", "cloudflare"], ["error-monitoring", "tracing", "logs"])'
+  '\nTest 1: get-docs(["hono", "cloudflare"], ["errors", "tracing", "logs"])'
 );
 {
   const result = simulateGetDocs(
     ["hono", "cloudflare"],
-    ["error-monitoring", "tracing", "logs"]
+    ["errors", "tracing", "logs"]
   );
   assert(result !== null, "result should not be null");
 
@@ -185,10 +185,7 @@ console.log(
     `should have 3 features, got: ${result!.features.length}`
   );
   const featureSlugs = result!.features.map((f) => f.slug);
-  assert(
-    featureSlugs.includes("error-monitoring"),
-    "features should include error-monitoring"
-  );
+  assert(featureSlugs.includes("errors"), "features should include errors");
   assert(featureSlugs.includes("tracing"), "features should include tracing");
   assert(featureSlugs.includes("logs"), "features should include logs");
 
@@ -220,16 +217,11 @@ console.log(
 }
 
 // =============================================================================
-// Test 2: ["hono", "bun"] with error-monitoring, tracing
+// Test 2: ["hono", "bun"] with errors, tracing
 // =============================================================================
-console.log(
-  '\nTest 2: get-docs(["hono", "bun"], ["error-monitoring", "tracing"])'
-);
+console.log('\nTest 2: get-docs(["hono", "bun"], ["errors", "tracing"])');
 {
-  const result = simulateGetDocs(
-    ["hono", "bun"],
-    ["error-monitoring", "tracing"]
-  );
+  const result = simulateGetDocs(["hono", "bun"], ["errors", "tracing"]);
   assert(result !== null, "result should not be null");
 
   assert(
@@ -281,15 +273,15 @@ console.log(
 }
 
 // =============================================================================
-// Test 3: ["hono", "node"] with error-monitoring, tracing, logs
+// Test 3: ["hono", "node"] with errors, tracing, logs
 // =============================================================================
 console.log(
-  '\nTest 3: get-docs(["hono", "node"], ["error-monitoring", "tracing", "logs"])'
+  '\nTest 3: get-docs(["hono", "node"], ["errors", "tracing", "logs"])'
 );
 {
   const result = simulateGetDocs(
     ["hono", "node"],
-    ["error-monitoring", "tracing", "logs"]
+    ["errors", "tracing", "logs"]
   );
   assert(result !== null, "result should not be null");
 
@@ -327,12 +319,12 @@ console.log(
 // Test 4: ["nextjs"] with all features — single runtime, no secondary
 // =============================================================================
 console.log(
-  '\nTest 4: get-docs(["nextjs"], ["error-monitoring", "tracing", "session-replay", "profiling", "logs"])'
+  '\nTest 4: get-docs(["nextjs"], ["errors", "tracing", "replay", "profiling", "logs"])'
 );
 {
   const result = simulateGetDocs(
     ["nextjs"],
-    ["error-monitoring", "tracing", "session-replay", "profiling", "logs"]
+    ["errors", "tracing", "replay", "profiling", "logs"]
   );
   assert(result !== null, "result should not be null");
 
@@ -373,9 +365,9 @@ console.log(
 // =============================================================================
 // Test 5: ["bun"] — single runtime, no secondary
 // =============================================================================
-console.log('\nTest 5: get-docs(["bun"], ["error-monitoring", "tracing"])');
+console.log('\nTest 5: get-docs(["bun"], ["errors", "tracing"])');
 {
-  const result = simulateGetDocs(["bun"], ["error-monitoring", "tracing"]);
+  const result = simulateGetDocs(["bun"], ["errors", "tracing"]);
   assert(result !== null, "result should not be null");
 
   assert(
@@ -396,14 +388,9 @@ console.log('\nTest 5: get-docs(["bun"], ["error-monitoring", "tracing"])');
 // =============================================================================
 // Test 6: ["node", "flask"] — cross-ecosystem, pick one
 // =============================================================================
-console.log(
-  '\nTest 6: get-docs(["node", "flask"], ["error-monitoring", "tracing"])'
-);
+console.log('\nTest 6: get-docs(["node", "flask"], ["errors", "tracing"])');
 {
-  const result = simulateGetDocs(
-    ["node", "flask"],
-    ["error-monitoring", "tracing"]
-  );
+  const result = simulateGetDocs(["node", "flask"], ["errors", "tracing"]);
   assert(result !== null, "result should not be null");
 
   // Should pick one ecosystem only — no mix
@@ -430,11 +417,11 @@ console.log(
   '\nTest 7: Feature deduplication — ["hono", "cloudflare"] with overlapping features'
 );
 {
-  // Both hono and cloudflare have error-monitoring, tracing, logs
+  // Both hono and cloudflare have errors, tracing, logs
   // Only cloudflare (dominant) versions should appear
   const result = simulateGetDocs(
     ["hono", "cloudflare"],
-    ["error-monitoring", "tracing", "logs", "crons", "user-feedback"]
+    ["errors", "tracing", "logs", "crons", "user-feedback"]
   );
   assert(result !== null, "result should not be null");
 
@@ -466,9 +453,9 @@ console.log(
 // =============================================================================
 console.log("\nTest 8: secondaryPatterns code filters by requested features");
 {
-  // Request only error-monitoring — hono secondary code should only include
-  // error-monitoring code, not tracing or logs
-  const result = simulateGetDocs(["hono", "cloudflare"], ["error-monitoring"]);
+  // Request only errors — hono secondary code should only include
+  // errors code, not tracing or logs
+  const result = simulateGetDocs(["hono", "cloudflare"], ["errors"]);
   assert(result !== null, "result should not be null");
 
   assert(
@@ -477,11 +464,11 @@ console.log("\nTest 8: secondaryPatterns code filters by requested features");
   );
 
   const honoPattern = result!.secondaryPatterns[0];
-  // The code should only contain error-monitoring code from hono
-  // (hono's error-monitoring code has "debug-sentry" in it)
+  // The code should only contain errors code from hono
+  // (hono's errors code has "debug-sentry" in it)
   assert(
     honoPattern.code.includes("debug-sentry"),
-    "hono secondary code should include error-monitoring example"
+    "hono secondary code should include errors example"
   );
 
   // Should NOT include tracing code (Sentry.startSpan)

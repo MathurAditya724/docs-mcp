@@ -10,7 +10,7 @@ const bun: SentrySkill = {
         "Auto-captures errors, uncaught exceptions, unhandled rejections.",
       name: "Error Monitoring",
       setup: "Configured by instrument.js. Manual: Sentry.captureException().",
-      slug: "error-monitoring",
+      slug: "errors",
     },
     {
       code: 'Sentry.startSpan({ op: "task", name: "my-task" }, async () => {\n  await fetch("https://example.com/api");\n});',

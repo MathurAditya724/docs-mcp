@@ -162,12 +162,10 @@ console.log('\nTest 1: get-available-features(["hono", "cloudflare"])');
     `has features, got: ${result.features.length}`
   );
   // Features should be attributed to cloudflare (dominant) first
-  const errorMonitoring = result.features.find(
-    (f) => f.slug === "error-monitoring"
-  );
+  const errorMonitoring = result.features.find((f) => f.slug === "errors");
   assert(
     errorMonitoring?.lib === "cloudflare",
-    `error-monitoring from cloudflare, got: ${errorMonitoring?.lib}`
+    `errors from cloudflare, got: ${errorMonitoring?.lib}`
   );
 }
 
@@ -217,9 +215,9 @@ console.log('\nTest 4: get-available-features(["nextjs"])');
   );
   // Verify key features are present
   const featureSlugs = result.features.map((f) => f.slug);
-  assert(featureSlugs.includes("error-monitoring"), "has error-monitoring");
+  assert(featureSlugs.includes("errors"), "has errors");
   assert(featureSlugs.includes("tracing"), "has tracing");
-  assert(featureSlugs.includes("session-replay"), "has session-replay");
+  assert(featureSlugs.includes("replay"), "has replay");
   assert(featureSlugs.includes("profiling"), "has profiling");
   assert(featureSlugs.includes("logs"), "has logs");
 }
@@ -294,14 +292,14 @@ console.log('\nTest 7: get-available-features(["node", "django"])');
 // get-docs tests
 // =============================================================================
 
-// Test 8: get-docs(["hono", "cloudflare"], ["error-monitoring", "tracing", "logs"])
+// Test 8: get-docs(["hono", "cloudflare"], ["errors", "tracing", "logs"])
 console.log(
-  '\nTest 8: get-docs(["hono", "cloudflare"], ["error-monitoring", "tracing", "logs"])'
+  '\nTest 8: get-docs(["hono", "cloudflare"], ["errors", "tracing", "logs"])'
 );
 {
   const result = simulateGetDocs(
     ["hono", "cloudflare"],
-    ["error-monitoring", "tracing", "logs"]
+    ["errors", "tracing", "logs"]
   );
   assert(result !== null, "result should not be null");
 
@@ -332,7 +330,7 @@ console.log(
     `3 features, got: ${result!.features.length}`
   );
   const featureSlugs = result!.features.map((f) => f.slug);
-  assert(featureSlugs.includes("error-monitoring"), "has error-monitoring");
+  assert(featureSlugs.includes("errors"), "has errors");
   assert(featureSlugs.includes("tracing"), "has tracing");
   assert(featureSlugs.includes("logs"), "has logs");
 
@@ -359,14 +357,14 @@ console.log(
   );
 }
 
-// Test 9: get-docs(["nextjs"], ["error-monitoring", "tracing", "session-replay", "logs", "profiling"])
+// Test 9: get-docs(["nextjs"], ["errors", "tracing", "replay", "logs", "profiling"])
 console.log(
-  '\nTest 9: get-docs(["nextjs"], ["error-monitoring", "tracing", "session-replay", "logs", "profiling"])'
+  '\nTest 9: get-docs(["nextjs"], ["errors", "tracing", "replay", "logs", "profiling"])'
 );
 {
   const result = simulateGetDocs(
     ["nextjs"],
-    ["error-monitoring", "tracing", "session-replay", "logs", "profiling"]
+    ["errors", "tracing", "replay", "logs", "profiling"]
   );
   assert(result !== null, "result should not be null");
 
@@ -390,9 +388,9 @@ console.log(
     `5 features, got: ${result!.features.length}`
   );
   const featureSlugs = result!.features.map((f) => f.slug);
-  assert(featureSlugs.includes("error-monitoring"), "has error-monitoring");
+  assert(featureSlugs.includes("errors"), "has errors");
   assert(featureSlugs.includes("tracing"), "has tracing");
-  assert(featureSlugs.includes("session-replay"), "has session-replay");
+  assert(featureSlugs.includes("replay"), "has replay");
   assert(featureSlugs.includes("logs"), "has logs");
   assert(featureSlugs.includes("profiling"), "has profiling");
 
@@ -414,15 +412,10 @@ console.log(
   );
 }
 
-// Test 10: get-docs(["hono", "bun"], ["error-monitoring", "tracing"])
-console.log(
-  '\nTest 10: get-docs(["hono", "bun"], ["error-monitoring", "tracing"])'
-);
+// Test 10: get-docs(["hono", "bun"], ["errors", "tracing"])
+console.log('\nTest 10: get-docs(["hono", "bun"], ["errors", "tracing"])');
 {
-  const result = simulateGetDocs(
-    ["hono", "bun"],
-    ["error-monitoring", "tracing"]
-  );
+  const result = simulateGetDocs(["hono", "bun"], ["errors", "tracing"]);
   assert(result !== null, "result should not be null");
 
   assert(
@@ -466,14 +459,14 @@ console.log(
   );
 }
 
-// Test 11: get-docs(["django"], ["error-monitoring", "tracing", "profiling"])
+// Test 11: get-docs(["django"], ["errors", "tracing", "profiling"])
 console.log(
-  '\nTest 11: get-docs(["django"], ["error-monitoring", "tracing", "profiling"])'
+  '\nTest 11: get-docs(["django"], ["errors", "tracing", "profiling"])'
 );
 {
   const result = simulateGetDocs(
     ["django"],
-    ["error-monitoring", "tracing", "profiling"]
+    ["errors", "tracing", "profiling"]
   );
   assert(result !== null, "result should not be null");
 
@@ -503,7 +496,7 @@ console.log(
     `3 features, got: ${result!.features.length}`
   );
   const featureSlugs = result!.features.map((f) => f.slug);
-  assert(featureSlugs.includes("error-monitoring"), "has error-monitoring");
+  assert(featureSlugs.includes("errors"), "has errors");
   assert(featureSlugs.includes("tracing"), "has tracing");
   assert(featureSlugs.includes("profiling"), "has profiling");
 
