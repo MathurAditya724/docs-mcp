@@ -128,3 +128,7 @@ Both tools must return predictable JSON. Define these shapes and stick to them.
 - [ ] 24. After tests pass, review `get-docs` output quality for each test case. Check: Could an AI agent follow this to set up Sentry correctly? Is it minimal? Are code examples correct?
 - [ ] 25. If output quality is lacking, improve the skills content or response assembly in `mcp.ts`. Re-run tests after every change
 - [ ] 26. Run a final pass: for each test case, count response size (characters and estimated tokens) and log a summary table. Verify all are within budget
+
+### Phase 7: Integration test with MCP Inspector
+
+- [ ] 27. Start the MCP server locally with `wrangler dev` and test it end-to-end using the MCP Inspector CLI: `npx @modelcontextprotocol/inspector`. Connect the inspector to the running server's `/mcp` endpoint. Manually call both `get-available-features` and `get-docs` through the inspector and verify the responses match the expected schema and content. Fix any issues found
