@@ -258,3 +258,14 @@ Task 24: DONE
 - All 231 tests pass (88 + 22 + 66 + 55), all 57 code blocks pass syntax validation
 - Build output: 1182.01 KiB
 - Commit: fix: improve get-docs output quality — remove placeholder code, add missing examples
+
+Task 25: DONE
+- Reviewed get-docs output quality for all test cases and identified 6 improvements
+- Filled empty code fields: session-replay (nextjs), profiling (nextjs, node, django, flask, fastapi) now have actionable comments/config instead of empty strings — agents no longer get blank code fields
+- Added missing import statements: Django user-feedback now includes `from django.shortcuts import render`, Flask user-feedback includes `from flask import render_template`, FastAPI user-feedback includes `from starlette.requests import Request` and `from starlette.responses import JSONResponse`
+- Enhanced Python tracing examples: Django, Flask, FastAPI tracing code now shows nested `sentry_sdk.start_span()` within `start_transaction()` (demonstrates span nesting, the primary custom instrumentation pattern)
+- Improved secondary pattern description in mcp.ts: changed generic "Hono integration pattern" to descriptive "Hono wiring — how to integrate Hono with the {runtime} Sentry SDK"
+- Added `import sentry_sdk` to all Python tracing code examples for self-containedness
+- Re-ran all tests: 231/231 passed (88 + 22 + 66 + 55), 57/57 code blocks pass syntax validation
+- Build output: 1183.49 KiB
+- Commit: fix: improve output quality — fill empty code fields, add imports, enhance tracing examples
