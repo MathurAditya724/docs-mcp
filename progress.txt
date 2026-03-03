@@ -218,3 +218,21 @@ Task 21: DONE
 - All 10 test cases comfortably within budget — largest single is 854 tokens (43% of 2000), largest combo is 1031 tokens (34% of 3000)
 - Build output unchanged at 1181.73 KiB
 - Commit: test: measure token count of get-docs output — all within budget
+
+Task 22: DONE
+- Created scripts/test-mcp.ts — comprehensive test script that imports registry functions directly and tests both tool handlers programmatically
+- 11 test cases covering all specified scenarios:
+  - get-available-features(["hono", "cloudflare"]) → dominant: cloudflare, hono in matchedLibs ✓
+  - get-available-features(["hono", "bun"]) → dominant: bun ✓
+  - get-available-features(["hono", "node"]) → dominant: node ✓
+  - get-available-features(["nextjs"]) → dominant: nextjs, 7 features (5+ required) ✓
+  - get-available-features(["bun"]) → dominant: bun ✓
+  - get-available-features(["express", "node"]) → dominant: node, express in unmatchedLibs ✓
+  - get-available-features(["node", "django"]) → picks one ecosystem (django), node in unmatchedLibs, ecosystemNote present ✓
+  - get-docs(["hono", "cloudflare"], ["error-monitoring", "tracing", "logs"]) → structured response, no LLM call, has secondaryPatterns for hono ✓
+  - get-docs(["nextjs"], ["error-monitoring", "tracing", "session-replay", "logs", "profiling"]) → full nextjs guide, all 5 features from nextjs ✓
+  - get-docs(["hono", "bun"], ["error-monitoring", "tracing"]) → bun + hono patterns ✓
+  - get-docs(["django"], ["error-monitoring", "tracing", "profiling"]) → python stack, sentry-sdk package ✓
+- All 88 assertions passed, 0 failures
+- Build output unchanged at 1181.73 KiB
+- Commit: test: create comprehensive MCP test script with all specified test cases
