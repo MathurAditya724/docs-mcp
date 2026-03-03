@@ -236,3 +236,12 @@ Task 22: DONE
 - All 88 assertions passed, 0 failures
 - Build output unchanged at 1181.73 KiB
 - Commit: test: create comprehensive MCP test script with all specified test cases
+
+Task 23: DONE
+- Ran all 4 test scripts: test-mcp.ts (88 assertions), test-resolution.ts (22), test-get-docs.ts (66), test-edge-cases.ts (55)
+- Found 1 failure: test-get-docs.ts Test 3 — "hono secondary pattern code should include Hono-specific examples"
+  - Hono error-monitoring code field used `app.get(...)` without creating the Hono app, so the merged secondary pattern code didn't contain the string "Hono"
+  - Fixed by adding `const app = new Hono();` to Hono error-monitoring code example, making the code self-documenting
+- Re-ran all tests: 231/231 total assertions passed (88 + 22 + 66 + 55), 0 failures
+- Build output: 1181.75 KiB (unchanged)
+- Commit: fix: add Hono constructor to error-monitoring code example for test clarity
