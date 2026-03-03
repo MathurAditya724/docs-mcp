@@ -13,7 +13,7 @@ const django: SentrySkill = {
       slug: "error-monitoring",
     },
     {
-      code: 'with sentry_sdk.start_transaction(op="task", name="my-task"):\n    do_work()',
+      code: 'with sentry_sdk.start_transaction(op="task", name="process-order"):\n    order = Order.objects.get(pk=order_id)\n    order.process()',
       description: "Auto-traces middleware, signals, DB, Redis, cache.",
       name: "Tracing",
       setup:

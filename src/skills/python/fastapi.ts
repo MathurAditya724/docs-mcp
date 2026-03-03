@@ -13,7 +13,7 @@ const fastapi: SentrySkill = {
       slug: "error-monitoring",
     },
     {
-      code: 'with sentry_sdk.start_transaction(op="task", name="my-task"):\n    do_work()',
+      code: 'with sentry_sdk.start_transaction(op="task", name="sync-data"):\n    database.execute("INSERT INTO sync_log (status) VALUES (:status)", {"status": "started"})',
       description: "Auto-traces middleware, DB, Redis.",
       name: "Tracing",
       setup:
@@ -44,7 +44,7 @@ const fastapi: SentrySkill = {
       slug: "crons",
     },
     {
-      code: '@app.exception_handler(Exception)\nasync def server_error_handler(request: Request, exc: Exception):\n    event_id = sentry_sdk.last_event_id()\n    html = f"""<script src="https://browser.sentry-cdn.com/10.41.0/bundle.min.js"></script>\n    <script>Sentry.init({{dsn:"___PUBLIC_DSN___"}});Sentry.showReportDialog({{eventId:"{event_id}"}});</script>"""\n    return HTMLResponse(content=html, status_code=500)',
+      code: '@app.exception_handler(Exception)\nasync def server_error_handler(request: Request, exc: Exception):\n    event_id = sentry_sdk.last_event_id()\n    return JSONResponse({"error": "Internal Server Error", "sentry_event_id": event_id}, status_code=500)\n\n# Frontend: Sentry.showReportDialog({ eventId: response.sentry_event_id })',
       description: "Crash-Report modal on error pages.",
       name: "User Feedback",
       setup:

@@ -13,7 +13,7 @@ const flask: SentrySkill = {
       slug: "error-monitoring",
     },
     {
-      code: 'with sentry_sdk.start_transaction(op="task", name="my-task"):\n    do_work()',
+      code: 'with sentry_sdk.start_transaction(op="task", name="send-email"):\n    send_confirmation_email(user_id)',
       description: "Auto-traces requests and DB queries.",
       name: "Tracing",
       setup:

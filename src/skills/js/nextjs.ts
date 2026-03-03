@@ -13,10 +13,11 @@ const nextjs: SentrySkill = {
       slug: "error-monitoring",
     },
     {
-      code: "",
+      code: 'await Sentry.startSpan({ op: "db.query", name: "fetch-user" }, async () => {\n  return await prisma.user.findUnique({ where: { id } });\n});',
       description: "Distributed tracing across all runtimes.",
       name: "Tracing",
-      setup: "Already configured: tracesSampleRate in gettingStarted init.",
+      setup:
+        "Already configured: tracesSampleRate in gettingStarted init. Sentry.startSpan() for custom spans.",
       slug: "tracing",
     },
     {
