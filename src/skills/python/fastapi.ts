@@ -5,62 +5,54 @@ const fastapi: SentrySkill = {
   ecosystem: "python",
   features: [
     {
-      code: 'import sentry_sdk\n\nsentry_sdk.init(\n    dsn="___PUBLIC_DSN___",\n    send_default_pii=True,\n)\n\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get("/sentry-debug")\nasync def trigger_error():\n    1 / 0  # raises ZeroDivisionError',
-      description:
-        "Automatically capture errors and exceptions from FastAPI route handlers and report them to Sentry.",
+      code: 'sentry_sdk.capture_exception(Exception("something broke"))',
+      description: "Auto-captures all 5xx errors.",
       name: "Error Monitoring",
       setup:
-        "Install sentry-sdk with pip. The FastAPI integration is enabled automatically when you initialize the Sentry SDK if fastapi is in your dependencies. Call sentry_sdk.init() before creating your FastAPI app. By default all 5xx status codes are reported. Request data including URL, HTTP method, headers, and JSON payloads is attached to all events. Set send_default_pii=True to include user information.",
+        "Configured by init(). FastApiIntegration auto-enabled. Manual: capture_exception().",
       slug: "error-monitoring",
     },
     {
-      code: 'import sentry_sdk\n\nsentry_sdk.init(\n    dsn="___PUBLIC_DSN___",\n    send_default_pii=True,\n    traces_sample_rate=1.0,\n)\n\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get("/")\nasync def homepage():\n    return {"message": "Hello, World!"}',
-      description:
-        "Monitor performance of FastAPI middleware, database queries, and Redis commands with automatic transaction creation.",
+      code: 'traces_sample_rate=1.0,\n\nfrom sentry_sdk.integrations.starlette import StarletteIntegration\nfrom sentry_sdk.integrations.fastapi import FastApiIntegration\nintegrations=[\n    StarletteIntegration(transaction_style="endpoint"),\n    FastApiIntegration(transaction_style="endpoint"),\n]',
+      description: "Auto-traces middleware, DB, Redis.",
       name: "Tracing",
       setup:
-        "Set traces_sample_rate in your sentry_sdk.init() call to enable performance monitoring. The integration automatically monitors the middleware stack, middleware send/receive callbacks, database queries, and Redis commands. Each FastAPI request creates a transaction in Sentry.",
+        "Set traces_sample_rate. Options: transaction_style, failed_request_status_codes, middleware_spans, http_methods_to_capture. Both StarletteIntegration + FastApiIntegration needed.",
       slug: "tracing",
     },
     {
-      code: 'import sentry_sdk\n\nsentry_sdk.init(\n    dsn="___PUBLIC_DSN___",\n    send_default_pii=True,\n    traces_sample_rate=1.0,\n    profile_session_sample_rate=1.0,\n    profile_lifecycle="trace",\n)',
-      description:
-        "Collect code-level profiling data for FastAPI requests to identify performance bottlenecks.",
+      code: 'profile_session_sample_rate=1.0,\nprofile_lifecycle="trace",',
+      description: "Code-level profiling. Requires tracing.",
       name: "Profiling",
       setup:
-        "Set profile_session_sample_rate and profile_lifecycle in your sentry_sdk.init() call along with traces_sample_rate. Profiles are automatically collected while there is an active span during FastAPI request handling.",
+        "Add profile_session_sample_rate and profile_lifecycle to init(). Requires traces_sample_rate > 0.",
       slug: "profiling",
     },
     {
-      code: 'import sentry_sdk\n\nsentry_sdk.init(\n    dsn="___PUBLIC_DSN___",\n    send_default_pii=True,\n    enable_logs=True,\n)\n\nimport logging\nlogger = logging.getLogger(__name__)\n\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get("/")\nasync def homepage():\n    logger.info("Homepage accessed")\n    return {"message": "Hello, World!"}',
-      description:
-        "Send structured logs from Python's logging module to Sentry as log events.",
+      code: 'enable_logs=True,\n\nimport logging\nlogger = logging.getLogger(__name__)\nlogger.info("Request processed")',
+      description: "Python logger messages sent to Sentry.",
       name: "Logs",
-      setup:
-        "Set enable_logs=True in your sentry_sdk.init() call. The Logging integration is enabled by default and will record log messages as both breadcrumbs and log events in Sentry.",
+      setup: "Set enable_logs=True. LoggingIntegration auto-enabled.",
       slug: "logs",
     },
     {
-      code: 'import sentry_sdk\nfrom sentry_sdk.crons import monitor\n\nsentry_sdk.init(\n    dsn="___PUBLIC_DSN___",\n    send_default_pii=True,\n)\n\n@monitor(monitor_slug="daily-cleanup")\nasync def run_scheduled_task():\n    await database.execute("DELETE FROM sessions WHERE expired_at < NOW()")',
-      description:
-        "Monitor periodic and scheduled tasks to detect missed, late, or failed executions.",
+      code: 'from sentry_sdk.crons import monitor\n\n@monitor(monitor_slug="daily-cleanup")\nasync def run_scheduled_task():\n    await database.execute("DELETE FROM sessions WHERE expired_at < NOW()")',
+      description: "Monitor scheduled tasks for missed/late/failed runs.",
       name: "Crons",
-      setup:
-        "Use the @monitor decorator from sentry_sdk.crons to wrap your scheduled task functions. Sentry will notify you if a task is missed, exceeds its maximum runtime, or fails. You can also use monitor as a context manager or send manual check-ins with capture_checkin.",
+      setup: "@monitor decorator or monitor() context manager.",
       slug: "crons",
     },
     {
-      code: 'import sentry_sdk\nfrom fastapi import FastAPI, Request\nfrom fastapi.responses import HTMLResponse\n\napp = FastAPI()\n\n@app.exception_handler(Exception)\nasync def server_error_handler(request: Request, exc: Exception):\n    event_id = sentry_sdk.last_event_id()\n    html = f"""\n    <html><body><h1>Server Error</h1>\n    <script src="https://browser.sentry-cdn.com/10.41.0/bundle.min.js" crossorigin="anonymous"></script>\n    <script>\n      Sentry.init({{ dsn: "___PUBLIC_DSN___" }});\n      Sentry.showReportDialog({{ eventId: "{event_id}" }});\n    </script>\n    </body></html>\n    """\n    return HTMLResponse(content=html, status_code=500)',
-      description:
-        "Collect user feedback when errors occur in your FastAPI application using the Crash-Report modal.",
+      code: '@app.exception_handler(Exception)\nasync def server_error_handler(request: Request, exc: Exception):\n    event_id = sentry_sdk.last_event_id()\n    html = f"""<script src="https://browser.sentry-cdn.com/10.41.0/bundle.min.js"></script>\n    <script>Sentry.init({{dsn:"___PUBLIC_DSN___"}});Sentry.showReportDialog({{eventId:"{event_id}"}});</script>"""\n    return HTMLResponse(content=html, status_code=500)',
+      description: "Crash-Report modal on error pages.",
       name: "User Feedback",
       setup:
-        "In your FastAPI exception handler, register an exception handler for Exception (not a status code — FastAPI exception handlers take exception classes). Retrieve the event ID with sentry_sdk.last_event_id() and render it into an HTML response that loads the Sentry browser SDK and calls Sentry.showReportDialog({ eventId }) to display a feedback modal.",
+        "Register exception_handler(Exception). Pass last_event_id() to showReportDialog().",
       slug: "user-feedback",
     },
   ],
   gettingStarted:
-    '## FastAPI SDK Setup\n\n### 1. Install the SDK\n\n```bash\npip install sentry-sdk\n```\n\n### 2. Initialize the SDK\n\nAdd the following before creating your FastAPI app:\n\n```python\nimport sentry_sdk\n\nsentry_sdk.init(\n    dsn="___PUBLIC_DSN___",\n    # Add request headers and IP for users\n    send_default_pii=True,\n    # Set traces_sample_rate to 1.0 to capture 100%\n    # of transactions for tracing.\n    traces_sample_rate=1.0,\n    # To collect profiles for all profile sessions,\n    # set profile_session_sample_rate to 1.0.\n    profile_session_sample_rate=1.0,\n    # Profiles will be automatically collected while\n    # there is an active span.\n    profile_lifecycle="trace",\n    # Enable logs to be sent to Sentry\n    enable_logs=True,\n)\n```\n\nThe FastAPI integration is enabled automatically when the SDK detects `fastapi` in your dependencies.\n\n### 3. Create your FastAPI app\n\n```python\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get("/")\nasync def homepage():\n    return {"message": "Hello, World!"}\n```\n\n### 4. Verify the setup\n\nAdd an intentional error to test:\n\n```python\n@app.get("/sentry-debug")\nasync def trigger_error():\n    1 / 0\n```\n\nVisit `http://localhost:8000/sentry-debug` in your browser. An error event and a transaction will appear in Sentry.\n\n### 5. Optional: Configure FastApiIntegration explicitly\n\nBecause FastAPI is built on Starlette, both integrations must be instantiated:\n\n```python\nfrom sentry_sdk.integrations.starlette import StarletteIntegration\nfrom sentry_sdk.integrations.fastapi import FastApiIntegration\n\nsentry_sdk.init(\n    dsn="___PUBLIC_DSN___",\n    send_default_pii=True,\n    traces_sample_rate=1.0,\n    integrations=[\n        StarletteIntegration(\n            transaction_style="endpoint",\n            failed_request_status_codes={403, *range(500, 599)},\n            http_methods_to_capture=("GET",),\n        ),\n        FastApiIntegration(\n            transaction_style="endpoint",\n            failed_request_status_codes={403, *range(500, 599)},\n            http_methods_to_capture=("GET",),\n        ),\n    ],\n)\n```\n\nOptions: `transaction_style` ("url" or "endpoint"), `failed_request_status_codes` (set of HTTP status codes to report), `middleware_spans` (True/False), `http_methods_to_capture` (tuple of HTTP methods).',
+    '```bash\npip install sentry-sdk\n```\n\nInit before creating FastAPI app:\n```python\nimport sentry_sdk\nsentry_sdk.init(\n    dsn="___PUBLIC_DSN___",\n    send_default_pii=True,\n    traces_sample_rate=1.0,\n    profile_session_sample_rate=1.0,\n    profile_lifecycle="trace",\n    enable_logs=True,\n)\n```\n\nFastApiIntegration + StarletteIntegration auto-enabled.',
   name: "FastAPI",
   packages: ["sentry-sdk"],
   rank: 8,

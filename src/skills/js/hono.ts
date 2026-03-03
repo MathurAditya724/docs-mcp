@@ -5,171 +5,56 @@ const hono: SentrySkill = {
   ecosystem: "javascript",
   features: [
     {
-      code: `import { Hono } from "hono";
-
-const app = new Hono();
-
-app.get("/debug-sentry", () => {
-  throw new Error("My first Sentry error!");
-});`,
-      description:
-        "Sentry automatically captures unhandled exceptions from Hono's onError handler. Errors with 3xx or 4xx status codes are ignored by default.",
+      code: 'app.get("/debug-sentry", () => {\n  throw new Error("My first Sentry error!");\n});',
+      description: "Auto-captures unhandled exceptions. 3xx/4xx ignored.",
       name: "Error Monitoring",
-      setup:
-        "Initialize Sentry via the runtime SDK (e.g. @sentry/node, @sentry/bun, or @sentry/cloudflare) before creating your Hono app. Sentry's honoIntegration hooks into Hono's onError to report unhandled exceptions automatically.",
+      setup: "Init Sentry via runtime SDK before creating Hono app.",
       slug: "error-monitoring",
     },
     {
-      code: `import { Hono } from "hono";
-import * as Sentry from "@sentry/node"; // or @sentry/bun, @sentry/cloudflare
-
-const app = new Hono();
-
-app.get("/users/:id", async (c) => {
-  return await Sentry.startSpan(
-    { op: "db.query", name: "fetch user" },
-    async () => {
-      const user = await db.query("SELECT * FROM users WHERE id = ?", [c.req.param("id")]);
-      return c.json(user);
-    },
-  );
-});`,
+      code: 'app.get("/users/:id", async (c) => {\n  return await Sentry.startSpan(\n    { op: "db.query", name: "fetch user" },\n    async () => {\n      const user = await db.query("SELECT * FROM users WHERE id = ?", [c.req.param("id")]);\n      return c.json(user);\n    },\n  );\n});',
       description:
-        "Track request performance across your Hono routes with distributed tracing. Requests are automatically instrumented by the runtime SDK.",
+        "Auto-instrumented by runtime SDK. startSpan() for custom spans.",
       name: "Tracing",
-      setup:
-        "Set tracesSampleRate in the runtime SDK's Sentry.init(). Hono requests are auto-instrumented. Use Sentry.startSpan() for custom spans within route handlers.",
+      setup: "Set tracesSampleRate in runtime Sentry.init().",
       slug: "tracing",
     },
     {
-      code: `import { Hono } from "hono";
-import * as Sentry from "@sentry/node"; // or @sentry/bun, @sentry/cloudflare
-
-const app = new Hono();
-const { logger } = Sentry;
-
-app.get("/", (c) => {
-  logger.info("Request received", { path: c.req.path });
-  return c.text("Hello!");
-});`,
-      description:
-        "Send structured logs from Hono route handlers to Sentry, correlated with errors and traces.",
+      code: 'app.get("/", (c) => {\n  Sentry.logger.info("Request received", { path: c.req.path });\n  return c.text("Hello!");\n});',
+      description: "Structured logs from Hono handlers.",
       name: "Logs",
-      setup:
-        "Set enableLogs: true in the runtime SDK's Sentry.init(). Use Sentry.logger methods (info, warn, error, etc.) within your Hono route handlers.",
+      setup: "Set enableLogs: true in runtime Sentry.init().",
       slug: "logs",
     },
     {
-      code: `import * as Sentry from "@sentry/node"; // or @sentry/bun, @sentry/cloudflare
-
-Sentry.withMonitor("daily-cleanup", async () => {
-  await db.deleteExpiredSessions();
-});
-
-// Or use captureCheckIn for manual control
-const checkInId = Sentry.captureCheckIn({
-  monitorSlug: "daily-cleanup",
-  status: "in_progress",
-});
-await runTask();
-Sentry.captureCheckIn({
-  checkInId,
-  monitorSlug: "daily-cleanup",
-  status: "ok",
-});`,
-      description:
-        "Monitor periodic and scheduled tasks to detect missed, late, or failed executions. Uses the runtime SDK's crons API.",
+      code: 'Sentry.withMonitor("daily-cleanup", async () => {\n  await db.deleteExpiredSessions();\n});',
+      description: "Monitor scheduled tasks via runtime SDK.",
       name: "Crons",
-      setup:
-        "Use Sentry.withMonitor() or Sentry.captureCheckIn() from the runtime SDK (@sentry/node, @sentry/bun, or @sentry/cloudflare). On Node.js, you can also use Sentry.cron.instrumentCron/instrumentNodeCron/instrumentNodeSchedule helpers to auto-instrument popular cron libraries.",
+      setup: "Sentry.withMonitor() or captureCheckIn() from runtime SDK.",
       slug: "crons",
     },
     {
-      code: `import * as Sentry from "@sentry/node"; // or @sentry/bun, @sentry/cloudflare
-
-// Collect feedback programmatically
-Sentry.captureFeedback({
-  name: "Jane Doe",
-  email: "jane@example.com",
-  message: "Something broke when I clicked submit.",
-});`,
-      description:
-        "Collect user feedback from your Hono application using the runtime SDK's programmatic API.",
+      code: 'Sentry.captureFeedback({ name: "Jane", email: "jane@example.com", message: "Bug report" });',
+      description: "User feedback via runtime SDK API.",
       name: "User Feedback",
-      setup:
-        "Use Sentry.captureFeedback() from the runtime SDK to collect and send user feedback programmatically. You can optionally pass an associatedEventId to link feedback to a specific error event.",
+      setup: "Sentry.captureFeedback() from runtime SDK.",
       slug: "user-feedback",
     },
   ],
-  gettingStarted: `## Hono + Sentry Setup
+  gettingStarted: `No dedicated Sentry SDK — use the runtime SDK (@sentry/node, @sentry/bun, or @sentry/cloudflare). \`@hono/sentry\` middleware is deprecated.
 
-Hono does not have its own Sentry SDK. Use the Sentry SDK for your runtime (@sentry/node, @sentry/bun, or @sentry/cloudflare). The community \`@hono/sentry\` middleware is deprecated — use the official Sentry SDK directly.
-
-### Node.js Runtime
-
-Initialize Sentry in \`instrument.mjs\` before importing Hono:
-
+Init Sentry via the runtime SDK before creating the Hono app. For Cloudflare Workers, wrap the Hono app with Sentry.withSentry():
 \`\`\`typescript
-// instrument.mjs
-import * as Sentry from "@sentry/node";
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-  tracesSampleRate: 1.0,
-  enableLogs: true,
-});
-\`\`\`
-
-Then start your app with:
-
-\`\`\`bash
-node --import ./instrument.mjs app.mjs
-\`\`\`
-
-### Cloudflare Workers Runtime
-
-Wrap your Hono app with \`Sentry.withSentry()\`:
-
-\`\`\`typescript
-// index.ts
 import { Hono } from "hono";
 import * as Sentry from "@sentry/cloudflare";
-
 const app = new Hono();
-
 export default Sentry.withSentry(
-  (env: Env) => ({
-    dsn: "___PUBLIC_DSN___",
-    sendDefaultPii: true,
-    tracesSampleRate: 1.0,
-    enableLogs: true,
-  }),
+  (env: Env) => ({ dsn: "___PUBLIC_DSN___", tracesSampleRate: 1.0 }),
   app,
 );
 \`\`\`
 
-### Bun Runtime
-
-Create \`instrument.ts\` and preload it:
-
-\`\`\`typescript
-// instrument.ts
-import * as Sentry from "@sentry/bun";
-
-Sentry.init({
-  dsn: "___PUBLIC_DSN___",
-  sendDefaultPii: true,
-  tracesSampleRate: 1.0,
-  enableLogs: true,
-});
-\`\`\`
-
-\`\`\`bash
-bun --preload ./instrument.ts app.ts
-\`\`\`
-
-Sentry automatically captures unhandled exceptions from Hono's \`onError\` handler (3xx/4xx status codes are excluded by default).`,
+For Node.js/Bun, init in a separate instrument file (see runtime skill). No Hono-specific wiring needed.`,
   name: "Hono",
   packages: [],
   rank: 1,
