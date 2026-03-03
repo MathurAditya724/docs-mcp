@@ -188,3 +188,13 @@ Task 19: DONE
 - Build output dropped from 1214.99 KiB to 1181.89 KiB (~33 KiB / 2.7% reduction)
 - All existing tests pass: 22/22 resolution, 65/66 get-docs (1 pre-existing), 55/55 edge cases
 - Commit: refactor: remove verbose prose and redundant content from all skills for token efficiency
+
+Task 20: DONE
+- Restructured all skill files so init code is not repeated in per-feature code fields
+- gettingStarted shows full Sentry.init() once; each feature's code now shows only incremental usage code
+- JS skills (nextjs, cloudflare, bun, node): removed tracesSampleRate, enableLogs, replaysSessionSampleRate, replayIntegration(), nodeProfilingIntegration(), feedbackIntegration() from feature code fields — moved to setup text with "Already configured in gettingStarted init" or "Add to Sentry.init():" instructions
+- Python skills (django, flask, fastapi): replaced init-level integration config (DjangoIntegration(), FlaskIntegration(), StarletteIntegration/FastApiIntegration()) in tracing code with incremental sentry_sdk.start_transaction() usage examples
+- All 57 code blocks pass syntax validation (0 errors)
+- All existing tests pass: 22/22 resolution, 65/66 get-docs (1 pre-existing), 55/55 edge cases
+- Build output: 1181.73 KiB (slightly smaller than 1181.89 KiB from Task 19)
+- Commit: refactor: restructure skills so init code appears once in gettingStarted, not per feature
