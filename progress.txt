@@ -245,3 +245,16 @@ Task 23: DONE
 - Re-ran all tests: 231/231 total assertions passed (88 + 22 + 66 + 55), 0 failures
 - Build output: 1181.75 KiB (unchanged)
 - Commit: fix: add Hono constructor to error-monitoring code example for test clarity
+
+Task 24: DONE
+- Reviewed get-docs output quality for all 4 main test cases (hono+cloudflare, nextjs full, hono+bun, django)
+- Evaluated each test case: Could an AI agent follow this to set up Sentry? Is it minimal? Are code examples correct?
+- Found and fixed 4 quality issues:
+  1. Python tracing code in django, flask, fastapi used placeholder `do_work()` — replaced with concrete examples (Django: Order.objects.get/process, Flask: send_confirmation_email, FastAPI: database.execute)
+  2. Next.js tracing had empty `code: ""` — added Sentry.startSpan() example with Prisma query
+  3. FastAPI user-feedback hardcoded CDN version `10.41.0` — replaced with JSONResponse pattern (no version lock-in)
+  4. FastAPI tracing initially used `await` outside function — fixed to sync call
+- Overall quality assessment: Output is actionable for AI agents — gettingStarted shows full init once, features show only incremental code, secondary patterns provide library-specific wiring
+- All 231 tests pass (88 + 22 + 66 + 55), all 57 code blocks pass syntax validation
+- Build output: 1182.01 KiB
+- Commit: fix: improve get-docs output quality — remove placeholder code, add missing examples
