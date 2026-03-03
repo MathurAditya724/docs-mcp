@@ -1,9 +1,10 @@
 /**
- * Task 21: Measure approximate token count of get-docs output.
- * Target: under 2000 tokens for single-runtime, under 3000 for combo stack.
+ * Task 26 (final pass): Measure response size (characters and estimated tokens)
+ * for every get-docs test case across the full test suite. Log a summary table
+ * and verify all responses are within budget.
  *
- * Token estimation: ~4 chars per token is a common approximation for English + code.
- * We also count words as a secondary metric (roughly 1.3 tokens per word for code-heavy text).
+ * Target: under 2000 tokens for single-runtime, under 3000 for combo stack.
+ * Token estimation: ~4 chars per token (standard for mixed English + code).
  */
 import { resolveSkills } from "../src/skills/registry";
 
@@ -108,16 +109,16 @@ function wordCount(text: string): number {
   return text.split(WHITESPACE_RE).filter((w) => w.length > 0).length;
 }
 
-// Test cases
+// All test cases from the full test suite (test-mcp.ts, test-get-docs.ts, test-edge-cases.ts)
 const testCases: Array<{
   label: string;
   libs: string[];
   features: string[];
   type: "single" | "combo";
 }> = [
-  // Single-runtime requests (target: <2000 tokens)
+  // ── Single-runtime, all features (target: <2000 tokens) ──
   {
-    label: '["nextjs"] all features',
+    label: '["nextjs"] all 7 features',
     libs: ["nextjs"],
     features: [
       "error-monitoring",
@@ -131,7 +132,7 @@ const testCases: Array<{
     type: "single",
   },
   {
-    label: '["node"] all features',
+    label: '["node"] all 6 features',
     libs: ["node"],
     features: [
       "error-monitoring",
@@ -144,19 +145,19 @@ const testCases: Array<{
     type: "single",
   },
   {
-    label: '["bun"] all features',
+    label: '["bun"] all 5 features',
     libs: ["bun"],
     features: ["error-monitoring", "tracing", "logs", "crons", "user-feedback"],
     type: "single",
   },
   {
-    label: '["cloudflare"] all features',
+    label: '["cloudflare"] all 5 features',
     libs: ["cloudflare"],
     features: ["error-monitoring", "tracing", "logs", "crons", "user-feedback"],
     type: "single",
   },
   {
-    label: '["django"] all features',
+    label: '["django"] all 6 features',
     libs: ["django"],
     features: [
       "error-monitoring",
@@ -169,7 +170,7 @@ const testCases: Array<{
     type: "single",
   },
   {
-    label: '["flask"] all features',
+    label: '["flask"] all 6 features',
     libs: ["flask"],
     features: [
       "error-monitoring",
@@ -182,7 +183,7 @@ const testCases: Array<{
     type: "single",
   },
   {
-    label: '["fastapi"] all features',
+    label: '["fastapi"] all 6 features',
     libs: ["fastapi"],
     features: [
       "error-monitoring",
@@ -194,21 +195,58 @@ const testCases: Array<{
     ],
     type: "single",
   },
-  // Combo stack requests (target: <3000 tokens)
+  // ── Single-runtime, partial features (from test-mcp.ts) ──
   {
-    label: '["hono", "cloudflare"] all features',
+    label: '["nextjs"] 5 features (no crons/feedback)',
+    libs: ["nextjs"],
+    features: [
+      "error-monitoring",
+      "tracing",
+      "session-replay",
+      "logs",
+      "profiling",
+    ],
+    type: "single",
+  },
+  {
+    label: '["django"] 3 features',
+    libs: ["django"],
+    features: ["error-monitoring", "tracing", "profiling"],
+    type: "single",
+  },
+  {
+    label: '["bun"] 2 features',
+    libs: ["bun"],
+    features: ["error-monitoring", "tracing"],
+    type: "single",
+  },
+  // ── Combo stacks (target: <3000 tokens) ──
+  {
+    label: '["hono","cloudflare"] all 5 features',
     libs: ["hono", "cloudflare"],
     features: ["error-monitoring", "tracing", "logs", "crons", "user-feedback"],
     type: "combo",
   },
   {
-    label: '["hono", "bun"] error-monitoring + tracing',
+    label: '["hono","cloudflare"] 3 features',
+    libs: ["hono", "cloudflare"],
+    features: ["error-monitoring", "tracing", "logs"],
+    type: "combo",
+  },
+  {
+    label: '["hono","cloudflare"] 1 feature',
+    libs: ["hono", "cloudflare"],
+    features: ["error-monitoring"],
+    type: "combo",
+  },
+  {
+    label: '["hono","bun"] 2 features',
     libs: ["hono", "bun"],
     features: ["error-monitoring", "tracing"],
     type: "combo",
   },
   {
-    label: '["hono", "node"] all features',
+    label: '["hono","node"] all 6 features',
     libs: ["hono", "node"],
     features: [
       "error-monitoring",
@@ -220,11 +258,34 @@ const testCases: Array<{
     ],
     type: "combo",
   },
+  {
+    label: '["hono","node"] 3 features',
+    libs: ["hono", "node"],
+    features: ["error-monitoring", "tracing", "logs"],
+    type: "combo",
+  },
+  // ── Cross-ecosystem (picks one, treated as single) ──
+  {
+    label: '["node","flask"] cross-eco 2 features',
+    libs: ["node", "flask"],
+    features: ["error-monitoring", "tracing"],
+    type: "single",
+  },
+  // ── Edge case: single known + unknown libs ──
+  {
+    label: '["node","express","koa"] 2 features',
+    libs: ["node", "express", "koa"],
+    features: ["error-monitoring", "tracing"],
+    type: "single",
+  },
 ];
 
-console.log("=".repeat(100));
-console.log("Task 21: Token count measurement for get-docs output");
-console.log("=".repeat(100));
+console.log("=".repeat(110));
+console.log("Task 26: Final pass — response size for all get-docs test cases");
+console.log(
+  "Budget: <2000 tokens (single-runtime), <3000 tokens (combo stack)"
+);
+console.log("=".repeat(110));
 console.log("");
 
 const results: Array<{
@@ -263,44 +324,88 @@ for (const tc of testCases) {
 }
 
 // Print summary table
+const COL = {
+  label: 48,
+  type: 8,
+  chars: 8,
+  words: 8,
+  tokens: 10,
+  budget: 8,
+  pct: 8,
+  status: 6,
+};
 console.log(
-  "Label".padEnd(45) +
-    "Type".padEnd(8) +
-    "Chars".padEnd(8) +
-    "Words".padEnd(8) +
-    "~Tokens".padEnd(10) +
-    "Budget".padEnd(8) +
+  "Label".padEnd(COL.label) +
+    "Type".padEnd(COL.type) +
+    "Chars".padEnd(COL.chars) +
+    "Words".padEnd(COL.words) +
+    "~Tokens".padEnd(COL.tokens) +
+    "Budget".padEnd(COL.budget) +
+    "% Used".padEnd(COL.pct) +
     "Status"
 );
-console.log("-".repeat(100));
+console.log("-".repeat(110));
 
 let allPass = true;
 for (const r of results) {
   const status = r.pass ? "✓ OK" : "✗ OVER";
+  const pct = Math.round((r.estTokens / r.budget) * 100) + "%";
   if (!r.pass) {
     allPass = false;
   }
   console.log(
-    r.label.padEnd(45) +
-      r.type.padEnd(8) +
-      String(r.chars).padEnd(8) +
-      String(r.words).padEnd(8) +
-      String(r.estTokens).padEnd(10) +
-      String(r.budget).padEnd(8) +
+    r.label.padEnd(COL.label) +
+      r.type.padEnd(COL.type) +
+      String(r.chars).padEnd(COL.chars) +
+      String(r.words).padEnd(COL.words) +
+      String(r.estTokens).padEnd(COL.tokens) +
+      String(r.budget).padEnd(COL.budget) +
+      pct.padEnd(COL.pct) +
       status
   );
 }
 
-console.log("-".repeat(100));
+console.log("-".repeat(110));
+
+// Summary statistics
+const singleResults = results.filter((r) => r.type === "single");
+const comboResults = results.filter((r) => r.type === "combo");
+const maxSingle = singleResults.reduce(
+  (max, r) => Math.max(max, r.estTokens),
+  0
+);
+const maxCombo = comboResults.reduce((max, r) => Math.max(max, r.estTokens), 0);
+const avgSingle = Math.round(
+  singleResults.reduce((sum, r) => sum + r.estTokens, 0) / singleResults.length
+);
+const avgCombo =
+  comboResults.length > 0
+    ? Math.round(
+        comboResults.reduce((sum, r) => sum + r.estTokens, 0) /
+          comboResults.length
+      )
+    : 0;
+
+console.log("");
+console.log(
+  `Total test cases: ${results.length} (${singleResults.length} single, ${comboResults.length} combo)`
+);
+console.log(
+  `Single-runtime: max ${maxSingle} tokens (${Math.round((maxSingle / 2000) * 100)}% of 2000 budget), avg ${avgSingle} tokens`
+);
+if (comboResults.length > 0) {
+  console.log(
+    `Combo stack:    max ${maxCombo} tokens (${Math.round((maxCombo / 3000) * 100)}% of 3000 budget), avg ${avgCombo} tokens`
+  );
+}
 console.log("");
 
 if (allPass) {
-  console.log("All responses are within token budget.");
+  console.log(`All ${results.length} responses are within token budget.`);
 } else {
   console.log(
     "WARNING: Some responses exceed token budget. See details above."
   );
-  // Log details of over-budget responses
   for (const r of results) {
     if (!r.pass) {
       console.log(
@@ -308,4 +413,5 @@ if (allPass) {
       );
     }
   }
+  process.exit(1);
 }
