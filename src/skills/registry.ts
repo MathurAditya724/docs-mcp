@@ -1,84 +1,22 @@
 import type { SentrySkill } from "../types";
-import angular from "./js/angular";
-import astro from "./js/astro";
-import awsServerless from "./js/aws-serverless";
 import bun from "./js/bun";
 import cloudflare from "./js/cloudflare";
-import deno from "./js/deno";
-import electron from "./js/electron";
-import ember from "./js/ember";
-import googleCloudServerless from "./js/google-cloud-serverless";
-import nestjs from "./js/nestjs";
+import hono from "./js/hono";
 import nextjs from "./js/nextjs";
 import node from "./js/node";
-import nuxt from "./js/nuxt";
-import react from "./js/react";
-import reactNative from "./js/react-native";
-import reactRouter from "./js/react-router";
-import remix from "./js/remix";
-import solid from "./js/solid";
-import solidstart from "./js/solidstart";
-import svelte from "./js/svelte";
-import sveltekit from "./js/sveltekit";
-import tanstackstartReact from "./js/tanstackstart-react";
-import vue from "./js/vue";
-import wasm from "./js/wasm";
-import aiohttp from "./python/aiohttp";
-import awsLambda from "./python/aws-lambda";
-import bottle from "./python/bottle";
-import celery from "./python/celery";
 import django from "./python/django";
-import falcon from "./python/falcon";
 import fastapi from "./python/fastapi";
 import flask from "./python/flask";
-import gcpFunctions from "./python/gcp-functions";
-import litestar from "./python/litestar";
-import pyramid from "./python/pyramid";
-import quart from "./python/quart";
-import sanic from "./python/sanic";
-import starlette from "./python/starlette";
-import tornado from "./python/tornado";
 
 const skills: Record<string, SentrySkill> = {
-  aiohttp,
-  angular,
-  astro,
-  awsLambda,
-  awsServerless,
-  bottle,
   bun,
-  celery,
   cloudflare,
-  deno,
   django,
-  electron,
-  ember,
-  falcon,
   fastapi,
   flask,
-  gcpFunctions,
-  googleCloudServerless,
-  litestar,
-  nestjs,
+  hono,
   nextjs,
   node,
-  nuxt,
-  pyramid,
-  quart,
-  react,
-  reactNative,
-  reactRouter,
-  remix,
-  sanic,
-  solid,
-  solidstart,
-  starlette,
-  svelte,
-  sveltekit,
-  tanstackstartReact,
-  tornado,
-  vue,
-  wasm,
 };
 
 const categoryPriority: Record<string, number> = {
@@ -88,29 +26,85 @@ const categoryPriority: Record<string, number> = {
 };
 
 export function resolveSkills(libs: string[]) {
-  const matched = libs
-    .filter((lib) => lib in skills)
-    .map((lib) => skills[lib])
-    .sort((a, b) => {
-      const catDiff =
-        (categoryPriority[b.category] ?? 0) -
-        (categoryPriority[a.category] ?? 0);
-      if (catDiff !== 0) {
-        return catDiff;
-      }
-      return b.rank - a.rank;
-    });
+  const unmatchedLibs = libs.filter((lib) => !(lib in skills));
+  const matched = libs.filter((lib) => lib in skills).map((lib) => skills[lib]);
+
+  // Ecosystem filtering: if libs span multiple ecosystems, pick the one
+  // with the most matched libs and treat the rest as ecosystem-mismatched.
+  const ecosystemCounts: Record<string, number> = {};
+  for (const skill of matched) {
+    ecosystemCounts[skill.ecosystem] =
+      (ecosystemCounts[skill.ecosystem] ?? 0) + 1;
+  }
+
+  // Pick the ecosystem with the most matched libs.
+  // Tie-break by highest total rank (sum of categoryPriority * rank), then alphabetically.
+  let dominantEcosystem: string | null = null;
+  let maxCount = 0;
+  let maxRankSum = 0;
+  for (const [eco, count] of Object.entries(ecosystemCounts)) {
+    const rankSum = matched
+      .filter((s) => s.ecosystem === eco)
+      .reduce(
+        (sum, s) => sum + (categoryPriority[s.category] ?? 0) * s.rank,
+        0
+      );
+    if (
+      count > maxCount ||
+      (count === maxCount && rankSum > maxRankSum) ||
+      (count === maxCount &&
+        rankSum === maxRankSum &&
+        dominantEcosystem !== null &&
+        eco < dominantEcosystem)
+    ) {
+      maxCount = count;
+      maxRankSum = rankSum;
+      dominantEcosystem = eco;
+    }
+  }
+
+  const ecosystemFiltered = matched.filter(
+    (s) => s.ecosystem === dominantEcosystem
+  );
+  const ecosystemMismatchedLibs = matched
+    .filter((s) => s.ecosystem !== dominantEcosystem)
+    .map((s) => s.slug);
+
+  const sorted = ecosystemFiltered.sort((a, b) => {
+    const catDiff =
+      (categoryPriority[b.category] ?? 0) - (categoryPriority[a.category] ?? 0);
+    if (catDiff !== 0) {
+      return catDiff;
+    }
+    return b.rank - a.rank;
+  });
 
   return {
-    dominant: matched[0] ?? null,
-    secondary: matched.slice(1),
+    dominant: sorted[0] ?? null,
+    secondary: sorted.slice(1),
+    unmatchedLibs,
+    ecosystemMismatchedLibs,
   };
 }
 
 export function getAvailableFeatures(libs: string[]) {
-  const { dominant, secondary } = resolveSkills(libs);
+  const { dominant, secondary, unmatchedLibs, ecosystemMismatchedLibs } =
+    resolveSkills(libs);
+
+  // Combine truly unknown libs and ecosystem-mismatched libs into unmatchedLibs
+  const allUnmatchedLibs = [...unmatchedLibs, ...ecosystemMismatchedLibs];
+
   if (!dominant) {
-    return { dominantLib: null, features: [], matchedLibs: [] as string[] };
+    return {
+      dominantLib: null,
+      features: [],
+      matchedLibs: [] as string[],
+      unmatchedLibs: allUnmatchedLibs,
+      ...(ecosystemMismatchedLibs.length > 0 && {
+        ecosystemNote:
+          "Cross-ecosystem mixing is not supported. Libraries from different ecosystems (JavaScript/Python) were ignored.",
+      }),
+    };
   }
 
   const allSkills = [dominant, ...secondary];
@@ -140,6 +134,11 @@ export function getAvailableFeatures(libs: string[]) {
     dominantLib: dominant.slug,
     features,
     matchedLibs: allSkills.map((s) => s.slug),
+    unmatchedLibs: allUnmatchedLibs,
+    ...(ecosystemMismatchedLibs.length > 0 && {
+      ecosystemNote:
+        "Cross-ecosystem mixing is not supported. Libraries from different ecosystems (JavaScript/Python) were ignored.",
+    }),
   };
 }
 

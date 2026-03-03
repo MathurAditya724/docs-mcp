@@ -9,4 +9,4 @@ node_modules/
 
 dist/
 
-sdks.json
+opencode.jsonc
