@@ -9,7 +9,7 @@ Designed to be consumed by an AI agent that initializes Sentry in a user's proje
 The server runs on Cloudflare Workers and exposes a single MCP endpoint via Streamable HTTP:
 
 ```
-http://localhost:8787/mcp
+http://localhost:8080/mcp
 ```
 
 ### MCP client config
@@ -19,7 +19,7 @@ http://localhost:8787/mcp
   "mcpServers": {
     "sentry-docs": {
       "type": "streamable-http",
-      "url": "http://localhost:8787/mcp"
+      "url": "http://localhost:8080/mcp"
     }
   }
 }
@@ -171,19 +171,19 @@ cp .env.example .env
 bun run dev
 ```
 
-Server starts at `http://localhost:8787/mcp`.
+Server starts at `http://localhost:8080/mcp`.
 
 ## Test with MCP Inspector
 
 ```bash
 # List registered tools
-npx @modelcontextprotocol/inspector --cli http://localhost:8787/mcp --transport http --method tools/list
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/list
 
 # Call get-available-features
-npx @modelcontextprotocol/inspector --cli http://localhost:8787/mcp --transport http --method tools/call --tool-name get-available-features --tool-arg 'libs=["nextjs"]'
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-available-features --tool-arg 'libs=["nextjs"]'
 
 # Call get-docs
-npx @modelcontextprotocol/inspector --cli http://localhost:8787/mcp --transport http --method tools/call --tool-name get-docs --tool-arg 'libs=["nextjs"]' --tool-arg 'features=["error-monitoring", "tracing"]'
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-docs --tool-arg 'libs=["nextjs"]' --tool-arg 'features=["error-monitoring", "tracing"]'
 ```
 
 ## Deploy

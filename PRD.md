@@ -131,47 +131,47 @@ Both tools must return predictable JSON. Define these shapes and stick to them.
 
 ### Phase 7: Integration test with MCP Inspector
 
-The MCP Inspector CLI (`npx @modelcontextprotocol/inspector --cli`) can call tools on a running MCP server directly from the command line. Our server runs on Streamable HTTP at `http://localhost:8787/mcp` (started via `bun run dev` which runs `wrangler dev`).
+The MCP Inspector CLI (`npx @modelcontextprotocol/inspector --cli`) can call tools on a running MCP server directly from the command line. Our server runs on Streamable HTTP at `http://localhost:8080/mcp` (started via `bun run dev` which runs `wrangler dev`).
 
 **CLI syntax reference:**
 
 ```bash
 # List all tools registered on the server
-npx @modelcontextprotocol/inspector --cli http://localhost:8787/mcp --transport http --method tools/list
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/list
 
 # Call a tool with arguments (--tool-arg passes key=value pairs)
-npx @modelcontextprotocol/inspector --cli http://localhost:8787/mcp --transport http --method tools/call --tool-name <tool> --tool-arg key=value
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name <tool> --tool-arg key=value
 
 # For array arguments, pass JSON strings
-npx @modelcontextprotocol/inspector --cli http://localhost:8787/mcp --transport http --method tools/call --tool-name get-available-features --tool-arg 'libs=["nextjs"]'
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-available-features --tool-arg 'libs=["nextjs"]'
 ```
 
 - [ ] 27. Start the MCP server with `bun run dev`. Then run the following commands using the MCP Inspector CLI and verify each response matches the expected schema and content:
 
 ```bash
 # Verify tools are registered
-npx @modelcontextprotocol/inspector --cli http://localhost:8787/mcp --transport http --method tools/list
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/list
 
 # Test get-available-features with single lib
-npx @modelcontextprotocol/inspector --cli http://localhost:8787/mcp --transport http --method tools/call --tool-name get-available-features --tool-arg 'libs=["nextjs"]'
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-available-features --tool-arg 'libs=["nextjs"]'
 
 # Test get-available-features with combo stack
-npx @modelcontextprotocol/inspector --cli http://localhost:8787/mcp --transport http --method tools/call --tool-name get-available-features --tool-arg 'libs=["hono", "cloudflare"]'
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-available-features --tool-arg 'libs=["hono", "cloudflare"]'
 
 # Test get-available-features with unknown libs
-npx @modelcontextprotocol/inspector --cli http://localhost:8787/mcp --transport http --method tools/call --tool-name get-available-features --tool-arg 'libs=["express", "node"]'
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-available-features --tool-arg 'libs=["express", "node"]'
 
 # Test get-available-features with mixed ecosystems
-npx @modelcontextprotocol/inspector --cli http://localhost:8787/mcp --transport http --method tools/call --tool-name get-available-features --tool-arg 'libs=["node", "django"]'
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-available-features --tool-arg 'libs=["node", "django"]'
 
 # Test get-docs with single lib
-npx @modelcontextprotocol/inspector --cli http://localhost:8787/mcp --transport http --method tools/call --tool-name get-docs --tool-arg 'libs=["nextjs"]' --tool-arg 'features=["error-monitoring", "tracing", "session-replay"]'
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-docs --tool-arg 'libs=["nextjs"]' --tool-arg 'features=["error-monitoring", "tracing", "session-replay"]'
 
 # Test get-docs with combo stack
-npx @modelcontextprotocol/inspector --cli http://localhost:8787/mcp --transport http --method tools/call --tool-name get-docs --tool-arg 'libs=["hono", "cloudflare"]' --tool-arg 'features=["error-monitoring", "tracing", "logs"]'
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-docs --tool-arg 'libs=["hono", "cloudflare"]' --tool-arg 'features=["error-monitoring", "tracing", "logs"]'
 
 # Test get-docs with python stack
-npx @modelcontextprotocol/inspector --cli http://localhost:8787/mcp --transport http --method tools/call --tool-name get-docs --tool-arg 'libs=["django"]' --tool-arg 'features=["error-monitoring", "tracing", "profiling"]'
+npx @modelcontextprotocol/inspector --cli http://localhost:8080/mcp --transport http --method tools/call --tool-name get-docs --tool-arg 'libs=["django"]' --tool-arg 'features=["error-monitoring", "tracing", "profiling"]'
 ```
 
 Fix any issues found — wrong response shapes, missing fields, crashes, etc. Re-run until all commands return valid responses matching the schema defined above

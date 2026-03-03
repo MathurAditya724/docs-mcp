@@ -2,7 +2,7 @@
   "name": "docs-mcp",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "wrangler dev --port 8080",
     "deploy": "wrangler deploy --minify",
     "generate:skills": "bun run ./scripts/generate-skills.ts",
     "generate:cf-types": "wrangler types --env-interface CloudflareBindings",
