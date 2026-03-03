@@ -269,3 +269,15 @@ Task 25: DONE
 - Re-ran all tests: 231/231 passed (88 + 22 + 66 + 55), 57/57 code blocks pass syntax validation
 - Build output: 1183.49 KiB
 - Commit: fix: improve output quality — fill empty code fields, add imports, enhance tracing examples
+
+Task 26: DONE
+- Updated scripts/measure-tokens.ts to be a comprehensive final pass covering all 18 get-docs test cases from the full test suite (test-mcp.ts, test-get-docs.ts, test-edge-cases.ts)
+- Added test cases: partial feature requests (nextjs 5 features, django 3 features, bun 2 features), additional combo variations (hono+cloudflare with 3 and 1 features, hono+node with 3 features), cross-ecosystem (node+flask), and edge cases (node+express+koa)
+- Added "% Used" column and summary statistics (max/avg tokens per category) to the output table
+- Results for all 18 test cases:
+  - Single-runtime (12 cases): max 975 tokens (49% of 2000 budget), avg 608 tokens — all within budget
+  - Combo stack (6 cases): max 1038 tokens (35% of 3000 budget), avg 788 tokens — all within budget
+  - Largest single: ["nextjs"] all 7 features = 975 tokens (3899 chars)
+  - Largest combo: ["hono","cloudflare"] all 5 features = 1038 tokens (4149 chars)
+- All 231 test assertions pass (88 + 22 + 66 + 55), no regressions
+- Commit: test: final pass — measure response size for all test cases, verify within budget
