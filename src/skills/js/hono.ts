@@ -5,7 +5,7 @@ const hono: SentrySkill = {
   ecosystem: "javascript",
   features: [
     {
-      code: 'app.get("/debug-sentry", () => {\n  throw new Error("My first Sentry error!");\n});',
+      code: 'const app = new Hono();\n\napp.get("/debug-sentry", () => {\n  throw new Error("My first Sentry error!");\n});',
       description: "Auto-captures unhandled exceptions. 3xx/4xx ignored.",
       name: "Error Monitoring",
       setup: "Init Sentry via runtime SDK before creating Hono app.",
