@@ -13,7 +13,7 @@ const flask: SentrySkill = {
       slug: "error-monitoring",
     },
     {
-      code: 'with sentry_sdk.start_transaction(op="task", name="send-email"):\n    send_confirmation_email(user_id)',
+      code: 'import sentry_sdk\n\nwith sentry_sdk.start_transaction(op="task", name="send-email"):\n    with sentry_sdk.start_span(name="send-confirmation"):\n        msg = Message("Confirmation", recipients=["user@example.com"])\n        mail.send(msg)',
       description: "Auto-traces requests and DB queries.",
       name: "Tracing",
       setup:
@@ -21,7 +21,7 @@ const flask: SentrySkill = {
       slug: "tracing",
     },
     {
-      code: "",
+      code: "# No additional code — configured in sentry_sdk.init() above.\n# Ensure profile_session_sample_rate and profile_lifecycle are set.",
       description: "Code-level profiling. Requires tracing.",
       name: "Profiling",
       setup:
@@ -44,7 +44,7 @@ const flask: SentrySkill = {
       slug: "crons",
     },
     {
-      code: '@app.errorhandler(500)\ndef server_error_handler(error):\n    return render_template("500.html",\n        sentry_event_id=sentry_sdk.last_event_id(),\n    ), 500\n\n# 500.html: Sentry.showReportDialog({ eventId: "{{ sentry_event_id }}" })',
+      code: 'from flask import render_template\nimport sentry_sdk\n\n@app.errorhandler(500)\ndef server_error_handler(error):\n    return render_template("500.html",\n        sentry_event_id=sentry_sdk.last_event_id(),\n    ), 500\n\n# 500.html: Sentry.showReportDialog({ eventId: "{{ sentry_event_id }}" })',
       description: "Crash-Report modal on error pages.",
       name: "User Feedback",
       setup:

@@ -162,7 +162,7 @@ export function createMcpServer() {
         if (skill.gettingStarted) {
           secondaryPatterns.push({
             lib: skill.slug,
-            description: `${skill.name} integration pattern`,
+            description: `${skill.name} wiring — how to integrate ${skill.name} with the ${dominant.name} Sentry SDK`,
             setup: skill.gettingStarted,
             code: skill.features
               .filter((f) => featureSet.has(f.slug))

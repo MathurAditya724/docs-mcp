@@ -21,11 +21,11 @@ const nextjs: SentrySkill = {
       slug: "tracing",
     },
     {
-      code: "",
+      code: "// No additional code — configured in instrumentation-client.ts init above.",
       description: "Browser session replays. Client-side only.",
       name: "Session Replay",
       setup:
-        "Already configured: replaysSessionSampleRate, replaysOnErrorSampleRate, replayIntegration() in gettingStarted client init.",
+        "Already configured: replaysSessionSampleRate, replaysOnErrorSampleRate, replayIntegration() in gettingStarted client init. Adjust sample rates to control volume.",
       slug: "session-replay",
     },
     {
@@ -37,11 +37,11 @@ const nextjs: SentrySkill = {
       slug: "logs",
     },
     {
-      code: "",
+      code: '// sentry.server.config.ts\nimport { nodeProfilingIntegration } from "@sentry/profiling-node";\n// Add to Sentry.init():\n//   integrations: [nodeProfilingIntegration()],\n//   profileSessionSampleRate: 1.0,',
       description: "V8 CpuProfiler profiling. Server-side only.",
       name: "Profiling",
       setup:
-        "Install @sentry/profiling-node. Add to sentry.server.config.ts Sentry.init(): integrations: [nodeProfilingIntegration()], profileSessionSampleRate: 1.0. Requires tracing. Not available in browser/edge.",
+        "Install @sentry/profiling-node. Add nodeProfilingIntegration() and profileSessionSampleRate to sentry.server.config.ts Sentry.init(). Requires tracing. Not available in browser/edge.",
       slug: "profiling",
     },
     {

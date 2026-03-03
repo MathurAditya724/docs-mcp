@@ -13,7 +13,7 @@ const django: SentrySkill = {
       slug: "error-monitoring",
     },
     {
-      code: 'with sentry_sdk.start_transaction(op="task", name="process-order"):\n    order = Order.objects.get(pk=order_id)\n    order.process()',
+      code: 'import sentry_sdk\n\nwith sentry_sdk.start_transaction(op="task", name="process-order"):\n    with sentry_sdk.start_span(name="fetch-order"):\n        order = Order.objects.get(pk=42)\n    with sentry_sdk.start_span(name="process"):\n        order.process()',
       description: "Auto-traces middleware, signals, DB, Redis, cache.",
       name: "Tracing",
       setup:
@@ -21,7 +21,7 @@ const django: SentrySkill = {
       slug: "tracing",
     },
     {
-      code: "",
+      code: "# No additional code — configured in sentry_sdk.init() above.\n# Ensure profile_session_sample_rate and profile_lifecycle are set.",
       description: "Code-level profiling. Requires tracing.",
       name: "Profiling",
       setup:
@@ -45,7 +45,7 @@ const django: SentrySkill = {
       slug: "crons",
     },
     {
-      code: 'def handler500(request):\n    return render(request, "500.html", {\n        "sentry_event_id": sentry_sdk.last_event_id(),\n    }, status=500)\n\n# urls.py: handler500 = "myapp.views.handler500"\n# 500.html: Sentry.showReportDialog({ eventId: "{{ sentry_event_id }}" })',
+      code: 'from django.shortcuts import render\nimport sentry_sdk\n\ndef handler500(request):\n    return render(request, "500.html", {\n        "sentry_event_id": sentry_sdk.last_event_id(),\n    }, status=500)\n\n# urls.py: handler500 = "myapp.views.handler500"\n# 500.html: Sentry.showReportDialog({ eventId: "{{ sentry_event_id }}" })',
       description: "Crash-Report modal on error pages.",
       name: "User Feedback",
       setup:

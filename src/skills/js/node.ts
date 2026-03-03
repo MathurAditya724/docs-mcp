@@ -21,11 +21,11 @@ const node: SentrySkill = {
       slug: "tracing",
     },
     {
-      code: "",
+      code: '// Add to instrument.mjs:\nimport { nodeProfilingIntegration } from "@sentry/profiling-node";\n// Add to Sentry.init():\n//   integrations: [nodeProfilingIntegration()],\n//   profileSessionSampleRate: 1.0,',
       description: "V8 CpuProfiler profiling.",
       name: "Profiling",
       setup:
-        "Install @sentry/profiling-node. Add to Sentry.init(): integrations: [nodeProfilingIntegration()], profileSessionSampleRate: 1.0. Requires tracing.",
+        "Install @sentry/profiling-node. Add nodeProfilingIntegration() and profileSessionSampleRate to Sentry.init(). Requires tracing.",
       slug: "profiling",
     },
     {

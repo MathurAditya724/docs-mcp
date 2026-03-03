@@ -13,7 +13,7 @@ const fastapi: SentrySkill = {
       slug: "error-monitoring",
     },
     {
-      code: 'with sentry_sdk.start_transaction(op="task", name="sync-data"):\n    database.execute("INSERT INTO sync_log (status) VALUES (:status)", {"status": "started"})',
+      code: 'import sentry_sdk\n\nwith sentry_sdk.start_transaction(op="task", name="sync-data"):\n    with sentry_sdk.start_span(name="insert-log"):\n        database.execute("INSERT INTO sync_log (status) VALUES (:status)", {"status": "started"})',
       description: "Auto-traces middleware, DB, Redis.",
       name: "Tracing",
       setup:
@@ -21,7 +21,7 @@ const fastapi: SentrySkill = {
       slug: "tracing",
     },
     {
-      code: "",
+      code: "# No additional code — configured in sentry_sdk.init() above.\n# Ensure profile_session_sample_rate and profile_lifecycle are set.",
       description: "Code-level profiling. Requires tracing.",
       name: "Profiling",
       setup:
@@ -44,7 +44,7 @@ const fastapi: SentrySkill = {
       slug: "crons",
     },
     {
-      code: '@app.exception_handler(Exception)\nasync def server_error_handler(request: Request, exc: Exception):\n    event_id = sentry_sdk.last_event_id()\n    return JSONResponse({"error": "Internal Server Error", "sentry_event_id": event_id}, status_code=500)\n\n# Frontend: Sentry.showReportDialog({ eventId: response.sentry_event_id })',
+      code: 'from starlette.requests import Request\nfrom starlette.responses import JSONResponse\nimport sentry_sdk\n\n@app.exception_handler(Exception)\nasync def server_error_handler(request: Request, exc: Exception):\n    event_id = sentry_sdk.last_event_id()\n    return JSONResponse({"error": "Internal Server Error", "sentry_event_id": event_id}, status_code=500)\n\n# Frontend: Sentry.showReportDialog({ eventId: response.sentry_event_id })',
       description: "Crash-Report modal on error pages.",
       name: "User Feedback",
       setup:
